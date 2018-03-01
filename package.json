@@ -1,0 +1,21 @@
+{
+  "name": "navybird",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "description": "A polyfill of (mostly) Bluebird utilties for native Promise",
+  "author": "Yeechan Lu",
+  "devDependencies": {
+    "mocha": "^5.0.1",
+    "nyc": "^11.4.1"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/nyc node_modules/.bin/mocha",
+    "coverage": "node_modules/.bin/nyc report --reporter=text-lcov"
+  },
+  "dependencies": {
+    "delay": "^2.0.0",
+    "p-catch-if": "^1.0.2",
+    "p-is-promise": "^1.1.0"
+  }
+}
