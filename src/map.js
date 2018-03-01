@@ -4,7 +4,7 @@
 // MIT License
 
 'use strict';
-module.exports = (Promise) => {
+module.exports = (Promise, apiRejection, FUNCTION_ERROR, classString) => {
   const map = (iterable, mapper, opts) => new Promise((resolve, reject) => {
     if (Promise.isPromise(iterable)) {
       return resolve(iterable.then((val) => map(val, mapper, opts)));
@@ -15,13 +15,13 @@ module.exports = (Promise) => {
     }, opts);
 
     if (typeof mapper !== 'function') {
-      throw new TypeError('Mapper function is required');
+      return resolve(apiRejection(FUNCTION_ERROR + classString(fn)));
     }
 
     const concurrency = opts.concurrency;
 
     if (!(typeof concurrency === 'number' && concurrency >= 1)) {
-      throw new TypeError(`Expected \`concurrency\` to be a number from 1 and up, got \`${concurrency}\` (${typeof concurrency})`);
+      throw new Promise.TypeError(`Expected \`concurrency\` to be a number from 1 and up, got \`${concurrency}\` (${typeof concurrency})`);
     }
 
     const ret = [];
