@@ -4,11 +4,20 @@
 // MIT License
 
 "use strict";
-module.exports = (Promise, apiRejection, FUNCTION_ERROR, classString) => {
-  const map = (iterable, mapper, opts) =>
-    new Promise((resolve, reject) => {
+module.exports = function mapFactory(
+  Promise,
+  apiRejection,
+  FUNCTION_ERROR,
+  classString
+) {
+  const map = function map(iterable, mapper, opts) {
+    return new Promise(function mapPromise(resolve, reject) {
       if (Promise.isPromise(iterable)) {
-        return resolve(iterable.then((val) => map(val, mapper, opts)));
+        return resolve(
+          iterable.then(function mapIterableWaiter(val) {
+            return map(val, mapper, opts);
+          })
+        );
       }
 
       opts = Object.assign(
@@ -37,7 +46,7 @@ module.exports = (Promise, apiRejection, FUNCTION_ERROR, classString) => {
       let resolvingCount = 0;
       let currentIdx = 0;
 
-      const next = () => {
+      const next = function mapProcessNext() {
         if (isRejected) {
           return;
         }
@@ -59,14 +68,16 @@ module.exports = (Promise, apiRejection, FUNCTION_ERROR, classString) => {
         resolvingCount++;
 
         Promise.resolve(nextItem.value)
-          .then((el) => mapper(el, i))
+          .then(function mapMapperWrapper(el) {
+            return mapper(el, i);
+          })
           .then(
-            (val) => {
+            function mapResolvedCallback(val) {
               ret[i] = val;
               resolvingCount--;
               next();
             },
-            (err) => {
+            function mapRejectedCallback(err) {
               isRejected = true;
               reject(err);
             }
@@ -81,6 +92,7 @@ module.exports = (Promise, apiRejection, FUNCTION_ERROR, classString) => {
         }
       }
     });
+  };
 
   return map;
 };
