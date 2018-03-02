@@ -6,12 +6,24 @@
   "description": "A polyfill of (mostly) Bluebird utilties for native Promise",
   "author": "Yeechan Lu",
   "devDependencies": {
+    "husky": "^0.14.3",
+    "lint-staged": "^7.0.0",
     "mocha": "^5.0.1",
-    "nyc": "^11.4.1"
+    "nyc": "^11.4.1",
+    "prettier": "^1.11.1"
   },
   "scripts": {
+    "precommit": "lint-staged",
     "test": "node_modules/.bin/nyc node_modules/.bin/mocha",
-    "coverage": "node_modules/.bin/nyc report --reporter=text-lcov"
+    "coverage": "node_modules/.bin/nyc report --reporter=text-lcov",
+    "prettier": "node_modules/prettier --write index.js",
+    "prettier-js": "prettier --trailing-comma es5 --arrow-parens always --write"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run prettier-js",
+      "git add"
+    ]
   },
   "dependencies": {
     "delay": "^2.0.0",
