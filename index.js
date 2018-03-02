@@ -88,11 +88,23 @@ class Navybird extends Promise {
       }
     );
   }
+
+  inspectable() {
+    return this.constructor.inspectable(this);
+  }
 }
 
 module.exports = Navybird;
 
 const FUNCTION_ERROR = "expecting a function but got ";
+
+const INSPECTION_VALUE_ERROR =
+  "cannot get fulfillment value of a non-fulfilled promise\n\n\
+    See http://goo.gl/MqrFmX\n";
+
+const INSPECTION_REASON_ERROR =
+  "cannot get rejection reason of a non-rejected promise\n\n\
+    See http://goo.gl/MqrFmX\n";
 
 const apiRejection = function(msg) {
   return Navybird.reject(new Navybird.TypeError(msg));
@@ -153,4 +165,53 @@ Navybird.join = function(...args) {
     return Navybird.all(args).spread(fn);
   }
   return Navybird.all(args);
+};
+
+Navybird.inspectable = function(promise) {
+  if (promise.isFulfilled && promise.isPending && promise.isRejected)
+    return promise;
+
+  let isPending = true;
+  let isRejected = false;
+  let isFulfilled = false;
+  let value = undefined;
+  let reason = undefined;
+
+  const result = promise.then(
+    function inspectableResolvedHandle(v) {
+      isFulfilled = true;
+      isPending = false;
+      value = v;
+      return v;
+    },
+    function inspectableRejectedHandle(e) {
+      isRejected = true;
+      isPending = false;
+      reason = e;
+      throw e;
+    }
+  );
+
+  result.isFulfilled = function() {
+    return isFulfilled;
+  };
+  result.isPending = function() {
+    return isPending;
+  };
+  result.isRejected = function() {
+    return isRejected;
+  };
+  result.isResolved = function() {
+    return !isPending;
+  };
+  result.value = function() {
+    if (isFulfilled) return value;
+    throw new Navybird.TypeError(INSPECTION_VALUE_ERROR);
+  };
+  result.reason = function() {
+    if (isRejected) return reason;
+    throw new Navybird.TypeError(INSPECTION_REASON_ERROR);
+  };
+
+  return result;
 };

@@ -66,7 +66,7 @@ describe("finally", function() {
     describe("when the callback returns a promise", function() {
       describe("that is fulfilled", function() {
         it("should fulfill with the original reason after that promise resolves", function() {
-          var promise = Promise.delay(1);
+          var promise = Promise.delay(1).inspectable();
 
           return Promise.resolve("foo")
             .lastly(function() {
@@ -151,7 +151,7 @@ describe("finally", function() {
     describe("when the callback returns a promise", function() {
       describe("that is fulfilled", function() {
         it("should reject with the original reason after that promise resolves", function() {
-          var promise = Promise.delay(1);
+          var promise = Promise.delay(1).inspectable();
 
           return Promise.reject(exception1)
             .lastly(function() {
