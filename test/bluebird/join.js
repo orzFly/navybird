@@ -21,93 +21,90 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 var assert = require("assert");
-var Promise = require('../..');
+var Promise = require("../..");
 
-describe("Promise.join-test", function () {
+describe("Promise.join-test", function() {
+  specify("should resolve empty input", function() {
+    return Promise.join().then(function(result) {
+      assert.deepEqual(result, []);
+    }, assert.fail);
+  });
 
+  specify("should join values", function() {
+    return Promise.join(1, 2, 3).then(function(results) {
+      assert.deepEqual(results, [1, 2, 3]);
+    }, assert.fail);
+  });
 
+  specify("should join promises array", function() {
+    return Promise.join(
+      Promise.resolve(1),
+      Promise.resolve(2),
+      Promise.resolve(3)
+    ).then(function(results) {
+      assert.deepEqual(results, [1, 2, 3]);
+    }, assert.fail);
+  });
 
-    specify("should resolve empty input", function() {
-        return Promise.join().then(
-            function(result) {
-                assert.deepEqual(result, []);
-            },
-            assert.fail
-        );
+  specify("should join mixed array", function() {
+    return Promise.join(Promise.resolve(1), 2, Promise.resolve(3), 4).then(
+      function(results) {
+        assert.deepEqual(results, [1, 2, 3, 4]);
+      },
+      assert.fail
+    );
+  });
+
+  specify("should reject if any input promise rejects", function() {
+    return Promise.join(
+      Promise.resolve(1),
+      Promise.reject(2),
+      Promise.resolve(3)
+    ).then(assert.fail, function(err) {
+      assert.deepEqual(err, 2);
     });
+  });
 
-    specify("should join values", function() {
-        return Promise.join(1, 2, 3).then(
-            function(results) {
-                assert.deepEqual(results, [1, 2, 3]);
-            },
-            assert.fail
-        );
+  specify("should call last argument as a spread function", function() {
+    return Promise.join(
+      Promise.resolve(1),
+      Promise.resolve(2),
+      Promise.resolve(3),
+      function(a, b, c) {
+        assert(a === 1);
+        assert(b === 2);
+        assert(c === 3);
+      }
+    );
+  });
+
+  specify("gh-227", function() {
+    function a() {
+      return Promise.join(Promise.resolve(1), function() {
+        throw new Error();
+      });
+    }
+
+    return a().then(assert.fail, function(e) {});
+  });
+
+  specify("should not pass the callback as argument, <5 arguments", function() {
+    return Promise.join(1, 2, 3, function() {
+      assert.strictEqual(arguments.length, 3);
     });
+  });
 
-    specify("should join promises array", function() {
-        return Promise.join(Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)).then(
-            function(results) {
-                assert.deepEqual(results, [1, 2, 3]);
-            },
-            assert.fail
-        );
+  specify("should not pass the callback as argument >5 arguments", function() {
+    return Promise.join(1, 2, 3, 4, 5, 6, 7, function() {
+      assert.strictEqual(arguments.length, 7);
     });
+  });
 
-    specify("should join mixed array", function() {
-        return Promise.join(Promise.resolve(1), 2, Promise.resolve(3), 4).then(
-            function(results) {
-                assert.deepEqual(results, [1, 2, 3, 4]);
-            },
-            assert.fail
-        );
+  specify("should ensure asynchronity", function() {
+    var sync = false;
+    Promise.join(Promise.resolve(1), Promise.resolve(2), function() {
+      sync = true;
     });
-
-    specify("should reject if any input promise rejects", function() {
-        return Promise.join(Promise.resolve(1), Promise.reject(2), Promise.resolve(3)).then(
-            assert.fail,
-            function(err) {
-                assert.deepEqual(err, 2);
-            }
-        );
-    });
-
-    specify("should call last argument as a spread function", function() {
-        return Promise.join(Promise.resolve(1), Promise.resolve(2), Promise.resolve(3), function(a, b, c) {
-            assert(a === 1);
-            assert(b === 2);
-            assert(c === 3);
-        });
-    });
-
-
-    specify("gh-227", function() {
-        function a() {
-            return Promise.join(Promise.resolve(1), function () {
-                throw new Error();
-            });
-        }
-
-        return a().then(assert.fail, function(e) {});
-    });
-
-    specify("should not pass the callback as argument, <5 arguments", function() {
-        return Promise.join(1, 2, 3, function() {
-            assert.strictEqual(arguments.length, 3);
-        });
-    });
-
-    specify("should not pass the callback as argument >5 arguments", function() {
-        return Promise.join(1, 2, 3, 4, 5, 6, 7, function() {
-            assert.strictEqual(arguments.length, 7);
-        });
-    });
-
-    specify("should ensure asynchronity", function() {
-        var sync = false;
-        Promise.join(Promise.resolve(1), Promise.resolve(2), function() {
-            sync = true;
-        });
-        assert.strictEqual(false, sync);
-    })
+    assert.strictEqual(false, sync);
+  });
 });
