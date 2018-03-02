@@ -92,6 +92,14 @@ class Navybird extends Promise {
   inspectable() {
     return this.constructor.inspectable(this);
   }
+
+  reflect() {
+    const inspection = new PromiseInspection(this);
+    const val = function reflectValue() {
+      return inspection;
+    };
+    return inspection.target().then(val, val);
+  }
 }
 
 module.exports = Navybird;
@@ -132,7 +140,8 @@ const catchFn = function(args) {
 Navybird.TypeError = TypeError;
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
-Navybird.prototype["lastly"] = Navybird.prototype.finally;
+Navybird.prototype.lastly = Navybird.prototype.finally;
+
 Navybird.delay = resolveWrapper(delay);
 Navybird.isPromise = require("p-is-promise");
 Navybird.map = require("./src/map")(
@@ -142,21 +151,28 @@ Navybird.map = require("./src/map")(
   classString
 );
 
+class NavybirdDefer {
+  constructor() {
+    const self = this;
+    this.promise = new Navybird(function deferPromiseCapturer(resolve, reject) {
+      self.resolve = resolve;
+      self.reject = reject;
+    });
+  }
+
+  get fulfill() {
+    return this.resolve;
+  }
+}
+
 Navybird.defer = function() {
-  let resolve, reject;
-  const promise = new Navybird(function deferPromiseCapturer(
-    _resolve,
-    _reject
-  ) {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  return {
-    resolve: resolve,
-    reject: reject,
-    promise: promise,
-  };
+  return new NavybirdDefer();
 };
+
+Navybird.cast = Navybird.resolve.bind(Navybird);
+Navybird.fulfilled = Navybird.resolve.bind(Navybird);
+Navybird.rejected = Navybird.reject.bind(Navybird);
+Navybird.pending = Navybird.defer.bind(Navybird);
 
 Navybird.join = function(...args) {
   const last = args.length - 1;
@@ -167,51 +183,75 @@ Navybird.join = function(...args) {
   return Navybird.all(args);
 };
 
-Navybird.inspectable = function(promise) {
-  if (promise.isFulfilled && promise.isPending && promise.isRejected)
-    return promise;
+class PromiseInspection {
+  constructor(target) {
+    const self = this;
 
-  let isPending = true;
-  let isRejected = false;
-  let isFulfilled = false;
-  let value = undefined;
-  let reason = undefined;
+    this._isPending = true;
+    this._isRejected = false;
+    this._isFulfilled = false;
+    this._value = undefined;
+    this._reason = undefined;
 
-  const result = promise.then(
-    function inspectableResolvedHandle(v) {
-      isFulfilled = true;
-      isPending = false;
-      value = v;
-      return v;
-    },
-    function inspectableRejectedHandle(e) {
-      isRejected = true;
-      isPending = false;
-      reason = e;
-      throw e;
-    }
-  );
+    this._target = target.then(
+      function inspectableResolvedHandle(v) {
+        self._isFulfilled = true;
+        self._isPending = false;
+        self._value = v;
+        return v;
+      },
+      function inspectableRejectedHandle(e) {
+        self._isRejected = true;
+        self._isPending = false;
+        self._reason = e;
+        throw e;
+      }
+    );
+  }
 
-  result.isFulfilled = function() {
-    return isFulfilled;
-  };
-  result.isPending = function() {
-    return isPending;
-  };
-  result.isRejected = function() {
-    return isRejected;
-  };
-  result.isResolved = function() {
-    return !isPending;
-  };
-  result.value = function() {
-    if (isFulfilled) return value;
+  target() {
+    return this._target;
+  }
+
+  isFulfilled() {
+    return this._isFulfilled;
+  }
+
+  isRejected() {
+    return this._isRejected;
+  }
+
+  isPending() {
+    return this._isPending;
+  }
+
+  value() {
+    if (this.isFulfilled()) return this._value;
+
     throw new Navybird.TypeError(INSPECTION_VALUE_ERROR);
-  };
-  result.reason = function() {
-    if (isRejected) return reason;
+  }
+
+  reason() {
+    if (this.isRejected()) return this._reason;
+
     throw new Navybird.TypeError(INSPECTION_REASON_ERROR);
-  };
+  }
+}
+
+Navybird.PromiseInspection = PromiseInspection;
+const NavybirdInspection = Symbol.for("NavybirdInspection");
+
+Navybird.inspectable = function(promise) {
+  if (promise[NavybirdInspection]) return promise;
+
+  const inspection = new PromiseInspection(promise);
+  const result = inspection.target();
+  result[NavybirdInspection] = inspection;
+  result.isFulfilled = inspection.isFulfilled.bind(inspection);
+  result.isPending = inspection.isPending.bind(inspection);
+  result.isRejected = inspection.isRejected.bind(inspection);
+  result.value = inspection.value.bind(inspection);
+  result.reason = inspection.reason.bind(inspection);
 
   return result;
 };

@@ -230,6 +230,13 @@ declare class Navybird<R> implements PromiseLike<R> {
   delay(ms: number): Navybird<R>;
 
   /**
+   * Synchronously inspect the state of this `promise`. The `PromiseInspection` will represent the state of
+   * the promise as snapshotted at the time of calling `.reflect()`.
+   */
+  reflect(): Navybird<Navybird.Inspection<R>>;
+  reflect(): Navybird<Navybird.Inspection<any>>;
+
+  /**
    * Convenience method for:
    *
    * <code>
@@ -279,9 +286,41 @@ declare class Navybird<R> implements PromiseLike<R> {
   static resolve<R>(value: R | PromiseLike<R>): Navybird<R>;
 
   /**
+   * Create a promise that is resolved with the given `value`. If `value` is a thenable or promise, the returned promise will assume its state.
+   */
+  static cast(): Navybird<void>;
+  static cast<R>(value: R | PromiseLike<R>): Navybird<R>;
+
+  /**
+   * Create a promise that is resolved with the given `value`. If `value` is a thenable or promise, the returned promise will assume its state.
+   */
+  static fulfilled(): Navybird<void>;
+  static fulfilled<R>(value: R | PromiseLike<R>): Navybird<R>;
+
+  /**
+   * Create a promise that is rejected with the given `reason`.
+   */
+  static reject(reason: any): Navybird<never>;
+
+  /**
+   * Create a promise that is rejected with the given `reason`.
+   */
+  static rejected(reason: any): Navybird<never>;
+
+  /**
    * Create a promise with undecided fate and return a `PromiseResolver` to control it. See resolution?: Promise(#promise-resolution).
    */
   static defer<R>(): Navybird.Resolver<R>;
+
+  /**
+   * Create a promise with undecided fate and return a `PromiseResolver` to control it. See resolution?: Promise(#promise-resolution).
+   */
+  static pending<R>(): Navybird.Resolver<R>;
+
+  /**
+   * (Navybird-only) Create an inspectable promise.
+   */
+  static inspectable(promise: PromiseLike<R>): InspectableNavybird<R>;
 
   /**
    * Returns a promise that will be resolved with value (or undefined) after given ms milliseconds.
@@ -397,6 +436,9 @@ declare class Navybird<R> implements PromiseLike<R> {
   ): Navybird<U[]>;
 }
 
+declare class InspectableNavybird<R> extends Navybird<R>
+  implements Navybird.Inspection<R> {}
+
 declare namespace Navybird {
   interface ConcurrencyOption {
     concurrency: number;
@@ -421,9 +463,45 @@ declare namespace Navybird {
     resolve(): void;
 
     /**
+     * Resolve the underlying promise with `value` as the resolution value. If `value` is a thenable or a promise, the underlying promise will assume its state.
+     */
+    fulfill(value: R): void;
+    fulfill(): void;
+
+    /**
      * Reject the underlying promise with `reason` as the rejection reason.
      */
     reject(reason: any): void;
+  }
+  interface Inspection<R> {
+    /**
+     * See if the underlying promise was fulfilled at the creation time of this inspection object.
+     */
+    isFulfilled(): boolean;
+
+    /**
+     * See if the underlying promise was rejected at the creation time of this inspection object.
+     */
+    isRejected(): boolean;
+
+    /**
+     * See if the underlying promise was defer at the creation time of this inspection object.
+     */
+    isPending(): boolean;
+
+    /**
+     * Get the fulfillment value of the underlying promise. Throws if the promise wasn't fulfilled at the creation time of this inspection object.
+     *
+     * throws `TypeError`
+     */
+    value(): R;
+
+    /**
+     * Get the rejection reason for the underlying promise. Throws if the promise wasn't rejected at the creation time of this inspection object.
+     *
+     * throws `TypeError`
+     */
+    reason(): any;
   }
 }
 
