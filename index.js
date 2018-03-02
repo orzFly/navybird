@@ -66,6 +66,28 @@ class Navybird extends Promise {
       return promiseConstructor.all(val);
     });
   }
+
+  finally(onFinally) {
+    const promiseConstructor = this.constructor;
+    onFinally = onFinally || function() {};
+
+    return this.then(
+      function finallyResolvedHandle(val) {
+        return promiseConstructor
+          .resolve(onFinally())
+          .then(function finallyResolvedValue() {
+            return val;
+          });
+      },
+      function finallyRejectedHandle(err) {
+        return promiseConstructor
+          .resolve(onFinally())
+          .then(function finallyRejectedValue() {
+            throw err;
+          });
+      }
+    );
+  }
 }
 
 module.exports = Navybird;
@@ -98,6 +120,7 @@ const catchFn = function(args) {
 Navybird.TypeError = TypeError;
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
+Navybird.prototype["lastly"] = Navybird.prototype.finally;
 Navybird.delay = resolveWrapper(delay);
 Navybird.isPromise = require("p-is-promise");
 Navybird.map = require("./src/map")(
