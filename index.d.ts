@@ -367,7 +367,7 @@ declare class Navybird<R> implements PromiseLike<R> {
   /**
    * (Navybird-only) Create an inspectable promise.
    */
-  static inspectable(promise: PromiseLike<R>): InspectableNavybird<R>;
+  static inspectable<R>(promise: PromiseLike<R>): InspectableNavybird<R>;
 
   /**
    * Returns a promise that will be resolved with value (or undefined) after given ms milliseconds.
@@ -562,7 +562,36 @@ declare class Navybird<R> implements PromiseLike<R> {
 }
 
 declare class InspectableNavybird<R> extends Navybird<R>
-  implements Navybird.Inspection<R> {}
+  implements Navybird.Inspection<R> {
+  /**
+   * See if the underlying promise was fulfilled at the creation time of this inspection object.
+   */
+  isFulfilled(): boolean;
+
+  /**
+   * See if the underlying promise was rejected at the creation time of this inspection object.
+   */
+  isRejected(): boolean;
+
+  /**
+   * See if the underlying promise was defer at the creation time of this inspection object.
+   */
+  isPending(): boolean;
+
+  /**
+   * Get the fulfillment value of the underlying promise. Throws if the promise wasn't fulfilled at the creation time of this inspection object.
+   *
+   * throws `TypeError`
+   */
+  value(): R;
+
+  /**
+   * Get the rejection reason for the underlying promise. Throws if the promise wasn't rejected at the creation time of this inspection object.
+   *
+   * throws `TypeError`
+   */
+  reason(): any;
+}
 
 declare namespace Navybird {
   interface ConcurrencyOption {
