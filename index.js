@@ -53,10 +53,31 @@ class Navybird extends Promise {
     });
   }
 
+  each(iterator) {
+    const promiseConstructor = this.constructor;
+    return this.then(function eachValue(val) {
+      return promiseConstructor.each(val, iterator);
+    });
+  }
+
+  eachSeries(iterator) {
+    const promiseConstructor = this.constructor;
+    return this.then(function eachSeriesValue(val) {
+      return promiseConstructor.eachSeries(val, iterator);
+    });
+  }
+
   map(mapper, opts) {
     const promiseConstructor = this.constructor;
     return this.then(function mapValue(val) {
       return promiseConstructor.map(val, mapper, opts);
+    });
+  }
+
+  mapSeries(mapper) {
+    const promiseConstructor = this.constructor;
+    return this.then(function mapSeriesValue(val) {
+      return promiseConstructor.mapSeries(val, mapper);
     });
   }
 
@@ -160,6 +181,40 @@ Navybird.map = require("./src/map")(
 );
 
 Navybird.reduce = require("./src/reduce")(Navybird);
+
+Navybird.eachSeries = function(iterable, iterator) {
+  const ret = [];
+
+  return Navybird.reduce(
+    iterable,
+    function eachSeriesReducer(a, b, i, length) {
+      return Navybird.resolve(iterator(b, i, length)).then(
+        function eachSeriesIteratorCallback(val) {
+          ret.push(b);
+        }
+      );
+    },
+    {}
+  ).thenReturn(ret);
+};
+
+Navybird.each = Navybird.eachSeries;
+
+Navybird.mapSeries = function(iterable, mapper) {
+  const ret = [];
+
+  return Navybird.reduce(
+    iterable,
+    function mapSeriesReducer(a, b, i, length) {
+      return Navybird.resolve(mapper(b, i, length)).then(
+        function mapSeriesMapperCallback(val) {
+          ret.push(val);
+        }
+      );
+    },
+    {}
+  ).thenReturn(ret);
+};
 
 class NavybirdDefer {
   constructor() {

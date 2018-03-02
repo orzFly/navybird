@@ -294,6 +294,39 @@ declare class Navybird<R> implements PromiseLike<R> {
   ): Navybird<U>;
 
   /**
+   * Same as calling ``Navybird.each(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
+   */
+  each<R, U>(
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<R[]>;
+
+  /**
+   * Same as calling ``Navybird.eachSeries(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
+   */
+  eachSeries<R, U>(
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<R[]>;
+
+  /**
+   * Same as calling ``Navybird.mapSeries(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
+   */
+  mapSeries<R, U>(
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<U[]>;
+
+  /**
    * Create a promise that is resolved with the given `value`. If `value` is a thenable or promise, the returned promise will assume its state.
    */
   static resolve(): Navybird<void>;
@@ -470,6 +503,62 @@ declare class Navybird<R> implements PromiseLike<R> {
     ) => U | PromiseLike<U>,
     initialValue?: U
   ): Navybird<U>;
+
+  /**
+   * Iterate over an array, or a promise of an array, which contains promises (or a mix of promises and values) with the given iterator function with the signature (item, index, value) where item is the resolved value of a respective promise in the input array.
+   * Iteration happens serially. If any promise in the input array is rejected the returned promise is rejected as well.
+   *
+   * Resolves to the original array unmodified, this method is meant to be used for side effects.
+   * If the iterator function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
+   */
+  static each<R, U>(
+    values:
+      | PromiseLike<Iterable<PromiseLike<R> | R>>
+      | Iterable<PromiseLike<R> | R>,
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<R[]>;
+
+  /**
+   * Iterate over an array, or a promise of an array, which contains promises (or a mix of promises and values) with the given iterator function with the signature (item, index, value) where item is the resolved value of a respective promise in the input array.
+   * Iteration happens serially. If any promise in the input array is rejected the returned promise is rejected as well.
+   *
+   * Resolves to the original array unmodified, this method is meant to be used for side effects.
+   * If the iterator function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
+   */
+  static eachSeries<R, U>(
+    values:
+      | PromiseLike<Iterable<PromiseLike<R> | R>>
+      | Iterable<PromiseLike<R> | R>,
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<R[]>;
+
+  /**
+   * Given an Iterable(arrays are Iterable), or a promise of an Iterable, which produces promises (or a mix of promises and values), iterate over all the values in the Iterable into an array and iterate over the array serially, in-order.
+   *
+   * Returns a promise for an array that contains the values returned by the iterator function in their respective positions.
+   * The iterator won't be called for an item until its previous item, and the promise returned by the iterator for that item are fulfilled.
+   * This results in a mapSeries kind of utility but it can also be used simply as a side effect iterator similar to Array#forEach.
+   *
+   * If any promise in the input array is rejected or any promise returned by the iterator function is rejected, the result will be rejected as well.
+   */
+  static mapSeries<R, U>(
+    values:
+      | PromiseLike<Iterable<PromiseLike<R> | R>>
+      | Iterable<PromiseLike<R> | R>,
+    iterator: (
+      item: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>
+  ): Navybird<U[]>;
 }
 
 declare class InspectableNavybird<R> extends Navybird<R>

@@ -15,6 +15,7 @@ module.exports = function mapFactory(Promise) {
         );
       }
 
+      const length = iterable.length;
       const iterator = iterable[Symbol.iterator]();
       let i = 0;
 
@@ -28,7 +29,7 @@ module.exports = function mapFactory(Promise) {
 
         Promise.all([total, el.value])
           .then(function reduceWrapper(value) {
-            next(reducer(value[0], value[1], i++));
+            next(reducer(value[0], value[1], i++, length));
           })
           .catch(reject);
       };
