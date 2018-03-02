@@ -1,4 +1,5 @@
 --slow 2000
 --timeout 10000
 --check-leaks
+--trace-warnings
 test/bluebird/*.js

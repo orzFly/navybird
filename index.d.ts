@@ -179,9 +179,9 @@ declare class Navybird<R> implements PromiseLike<R> {
    *
    * Alias `.lastly();` for compatibility with earlier ECMAScript version.
    */
-  finally<U>(handler: () => U | PromiseLike<U>): Bluebird<R>;
+  finally<U>(handler: () => U | PromiseLike<U>): Navybird<R>;
 
-  lastly<U>(handler: () => U | PromiseLike<U>): Bluebird<R>;
+  lastly<U>(handler: () => U | PromiseLike<U>): Navybird<R>;
 
   /**
    * Like `.finally()`, but not called for rejections.
@@ -278,6 +278,20 @@ declare class Navybird<R> implements PromiseLike<R> {
     mapper: (item: Q, index: number, arrayLength: number) => U | PromiseLike<U>,
     options?: Navybird.ConcurrencyOption
   ): Navybird<U[]>;
+
+  /**
+   * Same as calling `Promise.reduce(thisPromise, Function reducer, initialValue)`. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
+   */
+  // TODO type inference from array-resolving promise?
+  reduce<Q, U>(
+    reducer: (
+      memo: U,
+      item: Q,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>,
+    initialValue?: U
+  ): Navybird<U>;
 
   /**
    * Create a promise that is resolved with the given `value`. If `value` is a thenable or promise, the returned promise will assume its state.
@@ -434,6 +448,28 @@ declare class Navybird<R> implements PromiseLike<R> {
     mapper: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>,
     options?: Navybird.ConcurrencyOption
   ): Navybird<U[]>;
+
+  /**
+   * Reduce an array, or a promise of an array, which contains a promises (or a mix of promises and values) with the given `reducer` function with the signature `(total, current, index, arrayLength)` where `item` is the resolved value of a respective promise in the input array.
+   * If any promise in the input array is rejected the returned promise is rejected as well.
+   *
+   * If the reducer function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
+   *
+   * *The original array is not modified. If no `initialValue` is given and the array doesn't contain at least 2 items, the callback will not be called and `undefined` is returned.
+   * If `initialValue` is given and the array doesn't have at least 1 item, `initialValue` is returned.*
+   */
+  static reduce<R, U>(
+    values:
+      | PromiseLike<Iterable<PromiseLike<R> | R>>
+      | Iterable<PromiseLike<R> | R>,
+    reducer: (
+      total: U,
+      current: R,
+      index: number,
+      arrayLength: number
+    ) => U | PromiseLike<U>,
+    initialValue?: U
+  ): Navybird<U>;
 }
 
 declare class InspectableNavybird<R> extends Navybird<R>

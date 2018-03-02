@@ -46,7 +46,7 @@ module.exports = function mapFactory(
       let resolvingCount = 0;
       let currentIdx = 0;
 
-      const next = function mapProcessNext() {
+      const next = function mapNext() {
         if (isRejected) {
           return;
         }

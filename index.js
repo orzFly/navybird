@@ -55,8 +55,15 @@ class Navybird extends Promise {
 
   map(mapper, opts) {
     const promiseConstructor = this.constructor;
-    return this.then(function allValue(val) {
+    return this.then(function mapValue(val) {
       return promiseConstructor.map(val, mapper, opts);
+    });
+  }
+
+  reduce(reducer, initVal) {
+    const promiseConstructor = this.constructor;
+    return this.then(function reduceValue(val) {
+      return promiseConstructor.reduce(val, reducer, initVal);
     });
   }
 
@@ -144,12 +151,15 @@ Navybird.prototype.lastly = Navybird.prototype.finally;
 
 Navybird.delay = resolveWrapper(delay);
 Navybird.isPromise = require("p-is-promise");
+
 Navybird.map = require("./src/map")(
   Navybird,
   apiRejection,
   FUNCTION_ERROR,
   classString
 );
+
+Navybird.reduce = require("./src/reduce")(Navybird);
 
 class NavybirdDefer {
   constructor() {
