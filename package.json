@@ -17,11 +17,16 @@
     "test": "node_modules/.bin/nyc node_modules/.bin/mocha",
     "coverage": "node_modules/.bin/nyc report --reporter=text-lcov",
     "prettier": "node_modules/prettier --write index.js",
-    "prettier-js": "prettier --trailing-comma es5 --arrow-parens always --write"
+    "prettier-js": "prettier --trailing-comma es5 --arrow-parens always --write",
+    "prettier-ts": "prettier --parser typescript --trailing-comma es5 --arrow-parens always --write"
   },
   "lint-staged": {
     "*.js": [
       "npm run prettier-js",
+      "git add"
+    ],
+    "*.ts": [
+      "npm run prettier-ts",
       "git add"
     ]
   },
