@@ -50,9 +50,7 @@ class Navybird extends Promise {
 
   spread(fn) {
     if (typeof fn !== "function") {
-      return utils.apiRejection(
-        constants.FUNCTION_ERROR + utils.classString(fn)
-      );
+      return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
     }
     return this.then(function spreadValue(val) {
       return fn(...val);
@@ -153,9 +151,7 @@ Navybird.reduce = require("./src/reduce")(Navybird);
 Navybird.defer = require("./src/defer")(Navybird);
 Navybird.eachSeries = Navybird.each = require("./src/eachSeries")(Navybird);
 Navybird.mapSeries = require("./src/mapSeries")(Navybird);
-Navybird.fromCallback = Navybird.fromNode = require("./src/fromCallback")(
-  Navybird
-);
+Navybird.fromCallback = Navybird.fromNode = require("./src/fromCallback")(Navybird);
 Navybird.join = require("./src/join")(Navybird);
 Navybird.PromiseInspection = require("./src/inspection")(Navybird);
 Navybird.inspectable = require("./src/inspectable")(Navybird);

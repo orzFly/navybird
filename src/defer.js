@@ -4,10 +4,7 @@ module.exports = function deferFactory(Navybird) {
   class NavybirdDefer {
     constructor() {
       const self = this;
-      this.promise = new Navybird(function deferPromiseCapturer(
-        resolve,
-        reject
-      ) {
+      this.promise = new Navybird(function deferPromiseCapturer(resolve, reject) {
         self.resolve = resolve;
         self.reject = reject;
       });

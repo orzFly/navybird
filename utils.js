@@ -54,11 +54,7 @@ const isPrimitive = (module.exports.isPrimitive = function(val) {
   );
 });
 
-const notEnumerableProp = (module.exports.notEnumerableProp = function(
-  obj,
-  name,
-  value
-) {
+const notEnumerableProp = (module.exports.notEnumerableProp = function(obj, name, value) {
   if (isPrimitive(obj)) return obj;
   var descriptor = {
     value: value,
@@ -78,9 +74,7 @@ const markAsOriginatingFromRejection = (module.exports.markAsOriginatingFromReje
   } catch (ignore) {}
 });
 
-const originatesFromRejection = (module.exports.originatesFromRejection = function(
-  e
-) {
+const originatesFromRejection = (module.exports.originatesFromRejection = function(e) {
   if (e == null) return false;
   return (
     e instanceof Error[constants.BLUEBIRD_ERRORS].OperationalError ||

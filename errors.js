@@ -27,9 +27,7 @@ module.exports.errors = {
 
 const regexErrorKey = /^(?:name|message|stack|cause)$/;
 
-const wrapAsOperationalError = (module.exports.wrapAsOperationalError = function(
-  obj
-) {
+const wrapAsOperationalError = (module.exports.wrapAsOperationalError = function(obj) {
   var ret;
   if (utils.isUntypedError(obj)) {
     ret = new OperationalError(obj);

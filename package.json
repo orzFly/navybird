@@ -23,9 +23,9 @@
     "test:debug:only": "node_modules/.bin/mocha --stack_trace_limit=100 -r trace -r clarify",
     "coverage": "node_modules/.bin/nyc report --reporter=text-lcov",
     "coveralls": "node_modules/.bin/nyc report --reporter=text-lcov | node_modules/.bin/coveralls",
-    "prettier": "node_modules/prettier --write index.js",
-    "prettier-js": "prettier --trailing-comma es5 --arrow-parens always --write",
-    "prettier-ts": "prettier --parser typescript --trailing-comma es5 --arrow-parens always --write"
+    "prettier": "npm run prettier-js index.js",
+    "prettier-js": "node_modules/.bin/prettier --trailing-comma es5 --arrow-parens always --print-width=90 --write",
+    "prettier-ts": "node_modules/.bin/prettier --parser typescript --trailing-comma es5 --arrow-parens always --print-width=90 --write"
   },
   "lint-staged": {
     "*.js": [
