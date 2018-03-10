@@ -5,6 +5,7 @@ const errors = require("./errors");
 const implementations = {
   catch: require("./src/catch"),
   delay: require("delay"),
+  timeout: require("./src/timeout"),
 };
 
 const catchReturnHandleFactory = function(value) {
@@ -196,8 +197,8 @@ class Navybird extends Promise {
     return this.then(successAdapter, errorAdapter);
   }
 
-  timeout(x) {
-    return this;
+  timeout(ms, reason) {
+    return implementations.timeout(this, ms, reason);
   }
 }
 

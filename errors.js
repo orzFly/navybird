@@ -20,9 +20,24 @@ function OperationalError(message) {
 }
 utils.inherits(OperationalError, Error);
 
+function TimeoutError(message) {
+  if (!(this instanceof TimeoutError)) {
+    return new TimeoutError(message);
+  }
+
+  utils.notEnumerableProp(this, "name", "TimeoutError");
+  utils.notEnumerableProp(this, "message", message);
+
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+utils.inherits(TimeoutError, Error);
+
 module.exports.errors = {
   TypeError: TypeError,
   OperationalError: OperationalError,
+  TimeoutError: TimeoutError,
 };
 
 const regexErrorKey = /^(?:name|message|stack|cause)$/;
