@@ -7,6 +7,18 @@ const implementations = {
   delay: require("delay"),
 };
 
+const catchReturnHandleFactory = function(value) {
+  return function catchReturnValue() {
+    return value;
+  };
+};
+
+const catchThrowHandleFactory = function(reason) {
+  return function catchThrowReason() {
+    throw reason;
+  };
+};
+
 class Navybird extends Promise {
   caught(...args) {
     return Promise.prototype.catch.call(this, implementations.catch(args));
@@ -50,6 +62,20 @@ class Navybird extends Promise {
     return this.then(function thenReturnValue() {
       return value;
     });
+  }
+
+  thenThrow(reason) {
+    return this.then(function thenThrowReason() {
+      throw reason;
+    });
+  }
+
+  catchReturn(...args) {
+    return this.catch(implementations.catch(args, catchReturnHandleFactory));
+  }
+
+  catchThrow(...args) {
+    return this.catch(implementations.catch(args, catchThrowHandleFactory));
   }
 
   spread(fn) {
@@ -182,11 +208,13 @@ Object.assign(Navybird, errors.errors);
 
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
+Navybird.prototype["throw"] = Navybird.prototype.thenThrow;
 Navybird.prototype["lastly"] = Navybird.prototype.finally;
 Navybird.prototype["asCallback"] = Navybird.prototype.nodeify;
 
 Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");
+Navybird.promisify = require("util").promisify;
 
 Navybird.map = require("./src/map")(Navybird);
 Navybird.reduce = require("./src/reduce")(Navybird);

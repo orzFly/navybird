@@ -285,6 +285,104 @@ declare class Navybird<R> implements PromiseLike<R> {
   thenReturn<U>(value: U): Navybird<U>;
 
   /**
+   * Convenience method for:
+   *
+   * <code>
+   * .then(function() {
+   *    throw reason;
+   * });
+   * </code>
+   * Same limitations apply as with `.return()`.
+   *
+   * Alias `.thenThrow();` for compatibility with earlier ECMAScript version.
+   */
+  throw(reason: Error): Navybird<never>;
+  thenThrow(reason: Error): Navybird<never>;
+
+  /**
+   * Convenience method for:
+   *
+   * <code>
+   * .catch(function() {
+   *    return value;
+   * });
+   * </code>
+   *
+   * in the case where `value` doesn't change its value. That means `value` is bound at the time of calling `.catchReturn()`
+   */
+  catchReturn<U>(value: U): Navybird<R | U>;
+
+  // No need to be specific about Error types in these overrides, since there's no handler function
+  catchReturn<U>(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    filter4: CatchFilter<Error>,
+    filter5: CatchFilter<Error>,
+    value: U
+  ): Navybird<R | U>;
+  catchReturn<U>(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    filter4: CatchFilter<Error>,
+    value: U
+  ): Navybird<R | U>;
+  catchReturn<U>(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    value: U
+  ): Navybird<R | U>;
+  catchReturn<U>(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    value: U
+  ): Navybird<R | U>;
+  catchReturn<U>(filter1: CatchFilter<Error>, value: U): Navybird<R | U>;
+
+  /**
+   * Convenience method for:
+   *
+   * <code>
+   * .catch(function() {
+   *    throw reason;
+   * });
+   * </code>
+   * Same limitations apply as with `.catchReturn()`.
+   */
+  catchThrow(reason: Error): Navybird<R>;
+
+  // No need to be specific about Error types in these overrides, since there's no handler function
+  catchThrow(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    filter4: CatchFilter<Error>,
+    filter5: CatchFilter<Error>,
+    reason: Error
+  ): Navybird<R>;
+  catchThrow(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    filter4: CatchFilter<Error>,
+    reason: Error
+  ): Navybird<R>;
+  catchThrow(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    filter3: CatchFilter<Error>,
+    reason: Error
+  ): Navybird<R>;
+  catchThrow(
+    filter1: CatchFilter<Error>,
+    filter2: CatchFilter<Error>,
+    reason: Error
+  ): Navybird<R>;
+  catchThrow(filter1: CatchFilter<Error>, reason: Error): Navybird<R>;
+
+  /**
    * Like calling `.then`, but the fulfillment value or rejection reason is assumed to be an array, which is flattened to the formal parameters of the handlers.
    */
   spread<U, W>(fulfilledHandler: (...values: W[]) => U | PromiseLike<U>): Navybird<U>;

@@ -1,12 +1,18 @@
 const pCatchIf = require("p-catch-if");
 
-const catchFn = function(args) {
+const noop = function(a) {
+  return a;
+};
+
+const catchFn = function(args, handler) {
+  if (!handler) handler = noop;
+
   if (args.length > 2) {
-    return pCatchIf(args.slice(0, args.length - 1), args[args.length - 1]);
+    return pCatchIf(args.slice(0, args.length - 1), handler(args[args.length - 1]));
   } else if (args.length == 2) {
-    return pCatchIf(args[0], args[1]);
+    return pCatchIf(args[0], handler(args[1]));
   }
-  return args[0];
+  return handler(args[0]);
 };
 
 module.exports = catchFn;
