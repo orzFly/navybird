@@ -378,6 +378,26 @@ declare class Navybird<R> implements PromiseLike<R> {
   static delay(ms: number): Navybird<void>;
 
   /**
+   * Returns a promise that is resolved by a node style callback function.
+   */
+  static fromNode(
+    resolver: (callback: (err: any, result?: any) => void) => void,
+    options?: Navybird.FromNodeOptions
+  ): Navybird<any>;
+  static fromNode<T>(
+    resolver: (callback: (err: any, result?: T) => void) => void,
+    options?: Navybird.FromNodeOptions
+  ): Navybird<T>;
+  static fromCallback(
+    resolver: (callback: (err: any, result?: any) => void) => void,
+    options?: Navybird.FromNodeOptions
+  ): Navybird<any>;
+  static fromCallback<T>(
+    resolver: (callback: (err: any, result?: T) => void) => void,
+    options?: Navybird.FromNodeOptions
+  ): Navybird<T>;
+
+  /**
    * Given an array, or a promise of an array, which contains promises (or a mix of promises and values) return a promise that is fulfilled when all the items in the array are fulfilled.
    * The promise's fulfillment value is an array with fulfillment values at respective positions to the original array.
    * If any promise in the array rejects, the returned promise is rejected with the rejection reason.
@@ -596,6 +616,9 @@ declare class InspectableNavybird<R> extends Navybird<R>
 declare namespace Navybird {
   interface ConcurrencyOption {
     concurrency: number;
+  }
+  interface FromNodeOptions {
+    multiArgs?: boolean;
   }
 
   /** @deprecated Use PromiseLike<T> directly. */
