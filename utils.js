@@ -77,7 +77,10 @@ const markAsOriginatingFromRejection = (module.exports.markAsOriginatingFromReje
 const originatesFromRejection = (module.exports.originatesFromRejection = function(e) {
   if (e == null) return false;
   return (
-    e instanceof Error[constants.BLUEBIRD_ERRORS].OperationalError ||
-    e[constants.OPERATIONAL_ERROR_KEY] === true
+    (Navybird && e instanceof Navybird.OperationalError) ||
+    e[constants.OPERATIONAL_ERROR_KEY] === true ||
+    (Error[constants.BLUEBIRD_ERRORS] &&
+      Error[constants.BLUEBIRD_ERRORS].OperationalError &&
+      e instanceof Error[constants.BLUEBIRD_ERRORS].OperationalError)
   );
 });

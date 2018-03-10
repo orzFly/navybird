@@ -173,6 +173,11 @@ declare class Navybird<R> implements PromiseLike<R> {
   caught: Navybird<R>["catch"];
 
   /**
+   * Like `.catch` but instead of catching all types of exceptions, it only catches those that don't originate from thrown errors but rather from explicit rejections.
+   */
+  error<U>(onReject: (reason: any) => U | PromiseLike<U>): Navybird<U>;
+
+  /**
    * Pass a handler that will be called regardless of this promise's fate. Returns a new promise chained from this promise.
    *
    * There are special semantics for `.finally()` in that the final value cannot be modified from the handler.
@@ -257,12 +262,8 @@ declare class Navybird<R> implements PromiseLike<R> {
   /**
    * Like calling `.then`, but the fulfillment value or rejection reason is assumed to be an array, which is flattened to the formal parameters of the handlers.
    */
-  spread<U, W>(
-    fulfilledHandler: (...values: W[]) => U | PromiseLike<U>
-  ): Navybird<U>;
-  spread<U>(
-    fulfilledHandler: (...args: any[]) => U | PromiseLike<U>
-  ): Navybird<U>;
+  spread<U, W>(fulfilledHandler: (...values: W[]) => U | PromiseLike<U>): Navybird<U>;
+  spread<U>(fulfilledHandler: (...args: any[]) => U | PromiseLike<U>): Navybird<U>;
 
   /**
    * Same as calling `Promise.all(thisPromise)`. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
@@ -284,12 +285,7 @@ declare class Navybird<R> implements PromiseLike<R> {
    */
   // TODO type inference from array-resolving promise?
   reduce<Q, U>(
-    reducer: (
-      memo: U,
-      item: Q,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>,
+    reducer: (memo: U, item: Q, index: number, arrayLength: number) => U | PromiseLike<U>,
     initialValue?: U
   ): Navybird<U>;
 
@@ -297,33 +293,21 @@ declare class Navybird<R> implements PromiseLike<R> {
    * Same as calling ``Navybird.each(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
    */
   each<R, U>(
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<R[]>;
 
   /**
    * Same as calling ``Navybird.eachSeries(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
    */
   eachSeries<R, U>(
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<R[]>;
 
   /**
    * Same as calling ``Navybird.mapSeries(thisPromise, iterator)``. With the exception that if this promise is bound to a value, the returned promise is bound to that value too.
    */
   mapSeries<R, U>(
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<U[]>;
 
   /**
@@ -430,9 +414,7 @@ declare class Navybird<R> implements PromiseLike<R> {
   static all<T1>(values: [PromiseLike<T1> | T1]): Navybird<[T1]>;
   // array with values
   static all<R>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>
   ): Navybird<R[]>;
 
   /**
@@ -473,13 +455,7 @@ declare class Navybird<R> implements PromiseLike<R> {
     arg3: A3 | PromiseLike<A3>,
     arg4: A4 | PromiseLike<A4>,
     arg5: A5 | PromiseLike<A5>,
-    handler: (
-      arg1: A1,
-      arg2: A2,
-      arg3: A3,
-      arg4: A4,
-      arg5: A5
-    ) => R | PromiseLike<R>
+    handler: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => R | PromiseLike<R>
   ): Navybird<R>;
 
   // variadic array
@@ -495,9 +471,7 @@ declare class Navybird<R> implements PromiseLike<R> {
    * *The original array is not modified.*
    */
   static map<R, U>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>,
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
     mapper: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>,
     options?: Navybird.ConcurrencyOption
   ): Navybird<U[]>;
@@ -512,9 +486,7 @@ declare class Navybird<R> implements PromiseLike<R> {
    * If `initialValue` is given and the array doesn't have at least 1 item, `initialValue` is returned.*
    */
   static reduce<R, U>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>,
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
     reducer: (
       total: U,
       current: R,
@@ -532,14 +504,8 @@ declare class Navybird<R> implements PromiseLike<R> {
    * If the iterator function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
    */
   static each<R, U>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>,
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<R[]>;
 
   /**
@@ -550,14 +516,8 @@ declare class Navybird<R> implements PromiseLike<R> {
    * If the iterator function returns a promise or a thenable, the result for the promise is awaited for before continuing with next iteration.
    */
   static eachSeries<R, U>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>,
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<R[]>;
 
   /**
@@ -570,14 +530,8 @@ declare class Navybird<R> implements PromiseLike<R> {
    * If any promise in the input array is rejected or any promise returned by the iterator function is rejected, the result will be rejected as well.
    */
   static mapSeries<R, U>(
-    values:
-      | PromiseLike<Iterable<PromiseLike<R> | R>>
-      | Iterable<PromiseLike<R> | R>,
-    iterator: (
-      item: R,
-      index: number,
-      arrayLength: number
-    ) => U | PromiseLike<U>
+    values: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
+    iterator: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>
   ): Navybird<U[]>;
 }
 
@@ -624,8 +578,7 @@ declare namespace Navybird {
   /** @deprecated Use PromiseLike<T> directly. */
   type Thenable<T> = PromiseLike<T>;
 
-  type ResolvableProps<T> = object &
-    { [K in keyof T]: PromiseLike<T[K]> | T[K] };
+  type ResolvableProps<T> = object & { [K in keyof T]: PromiseLike<T[K]> | T[K] };
 
   interface Resolver<R> {
     /**

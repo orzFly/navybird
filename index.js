@@ -12,6 +12,10 @@ class Navybird extends Promise {
     return Promise.prototype.catch.call(this, implementations.catch(args));
   }
 
+  error(fn) {
+    return this.caught(utils.originatesFromRejection, fn);
+  }
+
   tap(fn) {
     const promiseConstructor = this.constructor;
     return this.then(function tapHandle(val) {
