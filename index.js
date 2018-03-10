@@ -1,5 +1,7 @@
 "use strict";
-
+const constants = require("./constants");
+const utils = require("./utils");
+const errors = require("./errors");
 const delay = require("delay");
 const pCatchIf = require("p-catch-if");
 
@@ -46,7 +48,7 @@ class Navybird extends Promise {
 
   spread(fn) {
     if (typeof fn !== "function") {
-      return apiRejection(FUNCTION_ERROR + classString(fn));
+      return apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
     }
     return this.then(function spreadValue(val) {
       return fn(...val);
@@ -132,50 +134,14 @@ class Navybird extends Promise {
 
 module.exports = Navybird;
 
-const FUNCTION_ERROR = "expecting a function but got ";
-
-const OPERATIONAL_ERROR_KEY = "isOperational";
-
-const INSPECTION_VALUE_ERROR =
-  "cannot get fulfillment value of a non-fulfilled promise\n\n\
-    See http://goo.gl/MqrFmX\n";
-
-const INSPECTION_REASON_ERROR =
-  "cannot get rejection reason of a non-rejected promise\n\n\
-    See http://goo.gl/MqrFmX\n";
-
 const apiRejection = function(msg) {
   return Navybird.reject(new Navybird.TypeError(msg));
-};
-
-const classString = function(obj) {
-  return {}.toString.call(obj);
 };
 
 const resolveWrapper = function(fn) {
   return function() {
     return Navybird.resolve(fn.apply(this, arguments));
   };
-};
-
-const inherits = function(Child, Parent) {
-  var hasProp = {}.hasOwnProperty;
-
-  function T() {
-    this.constructor = Child;
-    this.constructor$ = Parent;
-    for (var propertyName in Parent.prototype) {
-      if (
-        hasProp.call(Parent.prototype, propertyName) &&
-        propertyName.charAt(propertyName.length - 1) !== "$"
-      ) {
-        this[propertyName + "$"] = Parent.prototype[propertyName];
-      }
-    }
-  }
-  T.prototype = Parent.prototype;
-  Child.prototype = new T();
-  return Child.prototype;
 };
 
 const catchFn = function(args) {
@@ -187,56 +153,7 @@ const catchFn = function(args) {
   return args[0];
 };
 
-const isPrimitive = function(val) {
-  return (
-    val == null ||
-    val === true ||
-    val === false ||
-    typeof val === "string" ||
-    typeof val === "number"
-  );
-};
-
-const notEnumerableProp = function(obj, name, value) {
-  if (isPrimitive(obj)) return obj;
-  var descriptor = {
-    value: value,
-    configurable: true,
-    enumerable: false,
-    writable: true,
-  };
-  Object.defineProperty(obj, name, descriptor);
-  return obj;
-};
-
-const markAsOriginatingFromRejection = function(e) {
-  try {
-    notEnumerableProp(e, OPERATIONAL_ERROR_KEY, true);
-  } catch (ignore) {}
-};
-
-Navybird.TypeError = TypeError;
-
-function OperationalError(message) {
-  if (!(this instanceof OperationalError)) {
-    return new OperationalError(message);
-  }
-
-  notEnumerableProp(this, "name", "OperationalError");
-  notEnumerableProp(this, "message", message);
-  this.cause = message;
-  this[OPERATIONAL_ERROR_KEY] = true;
-
-  if (message instanceof Error) {
-    notEnumerableProp(this, "message", message.message);
-    notEnumerableProp(this, "stack", message.stack);
-  } else if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-inherits(OperationalError, Error);
-
-Navybird.OperationalError = OperationalError;
+Object.assign(Navybird, errors.errors);
 
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
@@ -248,8 +165,8 @@ Navybird.isPromise = require("p-is-promise");
 Navybird.map = require("./src/map")(
   Navybird,
   apiRejection,
-  FUNCTION_ERROR,
-  classString
+  errors.FUNCTION_ERROR,
+  errors.classString
 );
 
 Navybird.reduce = require("./src/reduce")(Navybird);
@@ -306,42 +223,16 @@ Navybird.defer = function() {
   return new NavybirdDefer();
 };
 
-const isUntypedError = function(obj) {
-  return obj instanceof Error && Object.getPrototypeOf(obj) === Error.prototype;
-};
-
-const regexErrorKey = /^(?:name|message|stack|cause)$/;
-
-const wrapAsOperationalError = function(obj) {
-  var ret;
-  if (isUntypedError(obj)) {
-    ret = new OperationalError(obj);
-    ret.name = obj.name;
-    ret.message = obj.message;
-    ret.stack = obj.stack;
-    var keys = Object.keys(obj);
-    for (var i = 0; i < keys.length; ++i) {
-      var key = keys[i];
-      if (!regexErrorKey.test(key)) {
-        ret[key] = obj[key];
-      }
-    }
-    return ret;
-  }
-  markAsOriginatingFromRejection(obj);
-  return obj;
-};
-
 Navybird.fromNode = Navybird.fromCallback = function(fn, options) {
   return new Navybird(function fromCallbackPromise(resolve, reject) {
     const nodeback =
       options && options.multiArgs
         ? function fromCallbackPromiseMultipleArgsCallback(err, ...args) {
-            if (err) return reject(wrapAsOperationalError(err));
+            if (err) return reject(errors.wrapAsOperationalError(err));
             return resolve(args);
           }
         : function fromCallbackPromiseSingleArgCallback(err, arg) {
-            if (err) return reject(wrapAsOperationalError(err));
+            if (err) return reject(errors.wrapAsOperationalError(err));
             return resolve(arg);
           };
     try {
