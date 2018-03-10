@@ -5,8 +5,6 @@ const errors = require("./errors");
 const implementations = {
   catch: require("./src/catch"),
   delay: require("delay"),
-  map: require("./src/map"),
-  reduce: require("./src/reduce"),
 };
 
 class Navybird extends Promise {
@@ -130,7 +128,7 @@ class Navybird extends Promise {
   }
 
   reflect() {
-    const inspection = new PromiseInspection(this);
+    const inspection = new this.constructor.PromiseInspection(this);
     const val = function reflectValue() {
       return inspection;
     };
@@ -139,8 +137,9 @@ class Navybird extends Promise {
 }
 
 module.exports = Navybird;
-Object.assign(Navybird, errors.errors);
 utils.setNavybird(Navybird);
+
+Object.assign(Navybird, errors.errors);
 
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
@@ -149,164 +148,17 @@ Navybird.prototype.lastly = Navybird.prototype.finally;
 Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");
 
-Navybird.map = implementations.map(Navybird);
-Navybird.reduce = implementations.reduce(Navybird);
-
-Navybird.eachSeries = function(iterable, iterator) {
-  const ret = [];
-
-  return Navybird.reduce(
-    iterable,
-    function eachSeriesReducer(a, b, i, length) {
-      return Navybird.resolve(iterator(b, i, length)).then(
-        function eachSeriesIteratorCallback(val) {
-          ret.push(b);
-        }
-      );
-    },
-    {}
-  ).thenReturn(ret);
-};
-
-Navybird.each = Navybird.eachSeries;
-
-Navybird.mapSeries = function(iterable, mapper) {
-  const ret = [];
-
-  return Navybird.reduce(
-    iterable,
-    function mapSeriesReducer(a, b, i, length) {
-      return Navybird.resolve(mapper(b, i, length)).then(
-        function mapSeriesMapperCallback(val) {
-          ret.push(val);
-        }
-      );
-    },
-    {}
-  ).thenReturn(ret);
-};
-
-class NavybirdDefer {
-  constructor() {
-    const self = this;
-    this.promise = new Navybird(function deferPromiseCapturer(resolve, reject) {
-      self.resolve = resolve;
-      self.reject = reject;
-    });
-  }
-
-  get fulfill() {
-    return this.resolve;
-  }
-}
-
-Navybird.defer = function() {
-  return new NavybirdDefer();
-};
-
-Navybird.fromNode = Navybird.fromCallback = function(fn, options) {
-  return new Navybird(function fromCallbackPromise(resolve, reject) {
-    const nodeback =
-      options && options.multiArgs
-        ? function fromCallbackPromiseMultipleArgsCallback(err, ...args) {
-            if (err) return reject(errors.wrapAsOperationalError(err));
-            return resolve(args);
-          }
-        : function fromCallbackPromiseSingleArgCallback(err, arg) {
-            if (err) return reject(errors.wrapAsOperationalError(err));
-            return resolve(arg);
-          };
-    try {
-      fn(nodeback);
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
+Navybird.map = require("./src/map")(Navybird);
+Navybird.reduce = require("./src/reduce")(Navybird);
+Navybird.defer = require("./src/defer")(Navybird);
+Navybird.each = Navybird.eachSeries = require("./src/eachSeries")(Navybird);
+Navybird.mapSeries = require("./src/mapSeries")(Navybird);
+Navybird.fromNode = Navybird.fromCallback = require("./src/fromNode")(Navybird);
+Navybird.join = require("./src/join")(Navybird);
+Navybird.PromiseInspection = require("./src/inspection")(Navybird);
+Navybird.inspectable = require("./src/inspectable")(Navybird);
 
 Navybird.cast = Navybird.resolve.bind(Navybird);
 Navybird.fulfilled = Navybird.resolve.bind(Navybird);
 Navybird.rejected = Navybird.reject.bind(Navybird);
 Navybird.pending = Navybird.defer.bind(Navybird);
-
-Navybird.join = function(...args) {
-  const last = args.length - 1;
-  if (last > 0 && typeof args[last] === "function") {
-    const fn = args.pop();
-    return Navybird.all(args).spread(fn);
-  }
-  return Navybird.all(args);
-};
-
-class PromiseInspection {
-  constructor(target) {
-    const self = this;
-
-    this._isPending = true;
-    this._isRejected = false;
-    this._isFulfilled = false;
-    this._value = undefined;
-    this._reason = undefined;
-
-    this._target = target.then(
-      function inspectableResolvedHandle(v) {
-        self._isFulfilled = true;
-        self._isPending = false;
-        self._value = v;
-        return v;
-      },
-      function inspectableRejectedHandle(e) {
-        self._isRejected = true;
-        self._isPending = false;
-        self._reason = e;
-        throw e;
-      }
-    );
-  }
-
-  target() {
-    return this._target;
-  }
-
-  isFulfilled() {
-    return this._isFulfilled;
-  }
-
-  isRejected() {
-    return this._isRejected;
-  }
-
-  isPending() {
-    return this._isPending;
-  }
-
-  value() {
-    if (this.isFulfilled()) return this._value;
-
-    throw new Navybird.TypeError(INSPECTION_VALUE_ERROR);
-  }
-
-  reason() {
-    if (this.isRejected()) return this._reason;
-
-    throw new Navybird.TypeError(INSPECTION_REASON_ERROR);
-  }
-}
-
-Navybird.PromiseInspection = PromiseInspection;
-const NavybirdInspection = Symbol.for("NavybirdInspection");
-
-Navybird.inspectable = function(promise) {
-  if (promise[NavybirdInspection]) return promise;
-
-  const inspection = new PromiseInspection(promise);
-  const result = inspection.target();
-  result[NavybirdInspection] = inspection;
-  result.isFulfilled = inspection.isFulfilled.bind(inspection);
-  result.isPending = inspection.isPending.bind(inspection);
-  result.isRejected = inspection.isRejected.bind(inspection);
-  result.value = inspection.value.bind(inspection);
-  result.reason = inspection.reason.bind(inspection);
-
-  return result;
-};
