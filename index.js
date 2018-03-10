@@ -136,6 +136,43 @@ class Navybird extends Promise {
     };
     return inspection.target().then(val, val);
   }
+
+  nodeify(cb, options) {
+    if (typeof cb !== "function") return this;
+    const spread = options !== undefined && Object(options).spread;
+    const successAdapter = spread
+      ? function nodeifySpreadAdapter(res) {
+          utils.nextTick(function nodeifySpreadAdapterNextTick() {
+            if (Array.isArray(res)) {
+              cb.apply(null, [null].concat(res));
+            }
+            return cb(null, res);
+          });
+        }
+      : function nodeifyNormalAdapter(res) {
+          utils.nextTick(function nodeifyNormalAdapterNextTick() {
+            return cb(null, res);
+          });
+        };
+
+    const errorAdapter = function nodeifyErrorAdapter(err) {
+      if (!err) {
+        var newErr = new Error(err + "");
+        newErr.cause = err;
+        err = newErr;
+      }
+
+      utils.nextTick(function nodeifyErrorAdapterNextTick() {
+        cb(err);
+      });
+    };
+
+    return this.then(successAdapter, errorAdapter);
+  }
+
+  timeout(x) {
+    return this;
+  }
 }
 
 module.exports = Navybird;
@@ -146,6 +183,7 @@ Object.assign(Navybird, errors.errors);
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
 Navybird.prototype["lastly"] = Navybird.prototype.finally;
+Navybird.prototype["asCallback"] = Navybird.prototype.nodeify;
 
 Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");

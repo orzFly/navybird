@@ -6,6 +6,19 @@ module.exports.setNavybird = function(n) {
   Navybird = n;
 };
 
+let nextTick;
+if (typeof setImmediate === "function") {
+  nextTick = setImmediate;
+} else if (typeof process === "object" && process && process.nextTick) {
+  nextTick = process.nextTick;
+} else {
+  nextTick = function(cb) {
+    setTimeout(cb, 0);
+  };
+}
+
+module.exports.nextTick = nextTick;
+
 const apiRejection = (module.exports.apiRejection = function(msg) {
   return Navybird.reject(new Navybird.TypeError(msg));
 });

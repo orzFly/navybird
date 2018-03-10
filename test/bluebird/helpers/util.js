@@ -1,5 +1,7 @@
 var assert = require("assert");
+var Promise = require("../../..");
 var token = {};
+
 module.exports = {
   awaitGlobalException: function(fn) {
     function replaceListeners(by) {
@@ -59,10 +61,7 @@ module.exports = {
   },
 
   awaitProcessExit: function(fn) {
-    if (
-      typeof process !== "undefined" &&
-      typeof process.execPath === "string"
-    ) {
+    if (typeof process !== "undefined" && typeof process.execPath === "string") {
       var exit;
       return new Promise(function(resolve, reject) {
         exit = process.exit;
@@ -276,8 +275,7 @@ module.exports = {
     "use strict";
     return this === undefined;
   })(),
-  isNodeJS:
-    typeof process !== "undefined" && typeof process.execPath === "string",
+  isNodeJS: typeof process !== "undefined" && typeof process.execPath === "string",
 };
 
 if (module.exports.isNodeJS) {

@@ -235,6 +235,31 @@ declare class Navybird<R> implements PromiseLike<R> {
   delay(ms: number): Navybird<R>;
 
   /**
+   * Returns a promise that will be fulfilled with this promise's fulfillment value or rejection reason.
+   *  However, if this promise is not fulfilled or rejected within ms milliseconds, the returned promise
+   *  is rejected with a TimeoutError or the error as the reason.
+   *
+   * You may specify a custom error message with the `message` parameter.
+   */
+  timeout(ms: number, message?: string | Error): Navybird<R>;
+
+  /**
+   * Register a node-style callback on this promise.
+   *
+   * When this promise is is either fulfilled or rejected,
+   * the node callback will be called back with the node.js convention where error reason is the first argument and success value is the second argument.
+   * The error argument will be `null` in case of success.
+   * If the `callback` argument is not a function, this method does not do anything.
+   */
+  nodeify(callback: (err: any, value?: R) => void, options?: Navybird.SpreadOption): this;
+  nodeify(...sink: any[]): this;
+  asCallback(
+    callback: (err: any, value?: R) => void,
+    options?: Navybird.SpreadOption
+  ): this;
+  asCallback(...sink: any[]): this;
+
+  /**
    * Synchronously inspect the state of this `promise`. The `PromiseInspection` will represent the state of
    * the promise as snapshotted at the time of calling `.reflect()`.
    */
@@ -573,6 +598,9 @@ declare namespace Navybird {
   }
   interface FromNodeOptions {
     multiArgs?: boolean;
+  }
+  interface SpreadOption {
+    spread: boolean;
   }
 
   /** @deprecated Use PromiseLike<T> directly. */
