@@ -1,11 +1,11 @@
 "use strict";
 const errors = require("../errors");
 
-module.exports = function fromNodeFactory(Navybird) {
+module.exports = function fromCallbackFactory(Navybird) {
   return function(fn, options) {
     return new Navybird(function fromCallbackPromise(resolve, reject) {
       const nodeback =
-        options && options.multiArgs
+        options !== undefined && Object(options).multiArgs
           ? function fromCallbackPromiseMultipleArgsCallback(err, ...args) {
               if (err) return reject(errors.wrapAsOperationalError(err));
               return resolve(args);

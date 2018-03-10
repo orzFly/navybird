@@ -151,9 +151,11 @@ Navybird.isPromise = require("p-is-promise");
 Navybird.map = require("./src/map")(Navybird);
 Navybird.reduce = require("./src/reduce")(Navybird);
 Navybird.defer = require("./src/defer")(Navybird);
-Navybird.each = Navybird.eachSeries = require("./src/eachSeries")(Navybird);
+Navybird.eachSeries = Navybird.each = require("./src/eachSeries")(Navybird);
 Navybird.mapSeries = require("./src/mapSeries")(Navybird);
-Navybird.fromNode = Navybird.fromCallback = require("./src/fromNode")(Navybird);
+Navybird.fromCallback = Navybird.fromNode = require("./src/fromCallback")(
+  Navybird
+);
 Navybird.join = require("./src/join")(Navybird);
 Navybird.PromiseInspection = require("./src/inspection")(Navybird);
 Navybird.inspectable = require("./src/inspectable")(Navybird);
