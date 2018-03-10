@@ -4,12 +4,10 @@
 // MIT License
 
 "use strict";
-module.exports = function mapFactory(
-  Promise,
-  apiRejection,
-  FUNCTION_ERROR,
-  classString
-) {
+const utils = require("../utils");
+const constants = require("../constants");
+
+module.exports = function mapFactory(Promise) {
   const map = function map(iterable, mapper, opts) {
     return new Promise(function mapPromise(resolve, reject) {
       if (Promise.isPromise(iterable)) {
@@ -28,7 +26,9 @@ module.exports = function mapFactory(
       );
 
       if (typeof mapper !== "function") {
-        return resolve(apiRejection(FUNCTION_ERROR + classString(fn)));
+        return resolve(
+          utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn))
+        );
       }
 
       const concurrency = opts.concurrency;

@@ -1,5 +1,21 @@
 const constants = require("./constants");
 
+let Navybird = undefined;
+
+module.exports.setNavybird = function(n) {
+  Navybird = n;
+};
+
+const apiRejection = (module.exports.apiRejection = function(msg) {
+  return Navybird.reject(new Navybird.TypeError(msg));
+});
+
+const resolveWrapper = (module.exports.resolveWrapper = function(fn) {
+  return function() {
+    return Navybird.resolve(fn.apply(this, arguments));
+  };
+});
+
 const isUntypedError = (module.exports.isUntypedError = function(obj) {
   return obj instanceof Error && Object.getPrototypeOf(obj) === Error.prototype;
 });

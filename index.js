@@ -2,12 +2,16 @@
 const constants = require("./constants");
 const utils = require("./utils");
 const errors = require("./errors");
-const delay = require("delay");
-const pCatchIf = require("p-catch-if");
+const implementations = {
+  catch: require("./src/catch"),
+  delay: require("delay"),
+  map: require("./src/map"),
+  reduce: require("./src/reduce"),
+};
 
 class Navybird extends Promise {
   caught(...args) {
-    return Promise.prototype.catch.call(this, catchFn(args));
+    return Promise.prototype.catch.call(this, implementations.catch(args));
   }
 
   tap(fn) {
@@ -27,7 +31,7 @@ class Navybird extends Promise {
     return this.catch(function tapCatchHandle(err) {
       return promiseConstructor
         .resolve(err)
-        .then(catchFn(args))
+        .then(implementations.catch(args))
         .then(function tapCatchValue() {
           return promiseConstructor.reject(err);
         });
@@ -36,7 +40,7 @@ class Navybird extends Promise {
 
   delay(ms) {
     return this.tap(function delayValue() {
-      return delay(ms);
+      return implementations.delay(ms);
     });
   }
 
@@ -48,7 +52,9 @@ class Navybird extends Promise {
 
   spread(fn) {
     if (typeof fn !== "function") {
-      return apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
+      return utils.apiRejection(
+        constants.FUNCTION_ERROR + utils.classString(fn)
+      );
     }
     return this.then(function spreadValue(val) {
       return fn(...val);
@@ -133,43 +139,18 @@ class Navybird extends Promise {
 }
 
 module.exports = Navybird;
-
-const apiRejection = function(msg) {
-  return Navybird.reject(new Navybird.TypeError(msg));
-};
-
-const resolveWrapper = function(fn) {
-  return function() {
-    return Navybird.resolve(fn.apply(this, arguments));
-  };
-};
-
-const catchFn = function(args) {
-  if (args.length > 2) {
-    return pCatchIf(args.slice(0, args.length - 1), args[args.length - 1]);
-  } else if (args.length == 2) {
-    return pCatchIf(args[0], args[1]);
-  }
-  return args[0];
-};
-
 Object.assign(Navybird, errors.errors);
+utils.setNavybird(Navybird);
 
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
 Navybird.prototype.lastly = Navybird.prototype.finally;
 
-Navybird.delay = resolveWrapper(delay);
+Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");
 
-Navybird.map = require("./src/map")(
-  Navybird,
-  apiRejection,
-  errors.FUNCTION_ERROR,
-  errors.classString
-);
-
-Navybird.reduce = require("./src/reduce")(Navybird);
+Navybird.map = implementations.map(Navybird);
+Navybird.reduce = implementations.reduce(Navybird);
 
 Navybird.eachSeries = function(iterable, iterator) {
   const ret = [];
