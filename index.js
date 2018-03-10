@@ -143,7 +143,7 @@ Object.assign(Navybird, errors.errors);
 
 Navybird.prototype["catch"] = Navybird.prototype.caught;
 Navybird.prototype["return"] = Navybird.prototype.thenReturn;
-Navybird.prototype.lastly = Navybird.prototype.finally;
+Navybird.prototype["lastly"] = Navybird.prototype.finally;
 
 Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");
@@ -162,3 +162,7 @@ Navybird.cast = Navybird.resolve.bind(Navybird);
 Navybird.fulfilled = Navybird.resolve.bind(Navybird);
 Navybird.rejected = Navybird.reject.bind(Navybird);
 Navybird.pending = Navybird.defer.bind(Navybird);
+
+Object.keys(Navybird).forEach(function(key) {
+  utils.notEnumerableProp(Navybird, key, Navybird[key]);
+});
