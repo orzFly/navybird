@@ -4,7 +4,6 @@ const utils = require("./utils");
 const errors = require("./errors");
 const implementations = {
   catch: require("./src/catch"),
-  delay: require("delay"),
   timeout: require("./src/timeout"),
 };
 
@@ -55,8 +54,12 @@ class Navybird extends Promise {
 
   delay(ms) {
     return this.tap(function delayValue() {
-      return implementations.delay(ms);
+      return Navybird.delay(ms);
     });
+  }
+
+  immediate() {
+    return this.tap(Navybird.immediate);
   }
 
   thenReturn(value) {
@@ -213,10 +216,11 @@ Navybird.prototype["throw"] = Navybird.prototype.thenThrow;
 Navybird.prototype["lastly"] = Navybird.prototype.finally;
 Navybird.prototype["asCallback"] = Navybird.prototype.nodeify;
 
-Navybird.delay = utils.resolveWrapper(implementations.delay);
 Navybird.isPromise = require("p-is-promise");
 Navybird.promisify = require("util").promisify;
 
+Navybird.immediate = require("./src/immediate")(Navybird);
+Navybird.delay = require("./src/delay")(Navybird);
 Navybird.map = require("./src/map")(Navybird);
 Navybird.reduce = require("./src/reduce")(Navybird);
 Navybird.defer = require("./src/defer")(Navybird);
@@ -224,6 +228,7 @@ Navybird.eachSeries = Navybird.each = require("./src/eachSeries")(Navybird);
 Navybird.mapSeries = require("./src/mapSeries")(Navybird);
 Navybird.fromCallback = Navybird.fromNode = require("./src/fromCallback")(Navybird);
 Navybird.join = require("./src/join")(Navybird);
+
 Navybird.PromiseInspection = require("./src/inspection")(Navybird);
 Navybird.inspectable = require("./src/inspectable")(Navybird);
 
