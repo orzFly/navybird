@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "lerna run --stream --concurrency 1 --sort build",
+    "watch": "lerna run watch --stream --no-sort --concurrency 9999",
+    "clean": "lerna run --stream clean",
+    "fix": "lerna run --stream --concurrency 1 fix",
+    "lint": "lerna run --stream --concurrency 1 lint",
+    "lint:json": "lerna run --stream --concurrency 1 lint:tslint:json",
+    "test": "lerna run --stream --concurrency 1 --sort test"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^3.5.0",
+    "npm-run-all": "^4.1.2",
+    "rimraf": "^2.6.2"
+  },
+  "name": "navybird-mono"
+}
