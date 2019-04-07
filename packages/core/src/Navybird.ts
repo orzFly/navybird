@@ -1,5 +1,15 @@
 import { map, ConcurrencyOption } from './functions/map';
 import { delay } from './functions/delay';
+import { isPromise } from './functions/isPromise';
+import { isPromiseLike } from './functions/isPromiseLike';
+
+export class Navybird<T> extends Promise<T> {
+  static isPromise: typeof isPromise = isPromise
+  static isPromiseLike: typeof isPromiseLike = isPromiseLike
+
+  static map: NavybirdMap = map as any
+  static delay: NavybirdDelay = delay as any
+}
 
 /**
  * @$TypeExpand typeof map
@@ -12,8 +22,3 @@ type NavybirdMap = <R, U>(iterable: Iterable<R | PromiseLike<R>> | PromiseLike<I
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
 type NavybirdDelay = { <R>(ms: number, value: R | PromiseLike<R>): Navybird<R>; (ms: number): Navybird<void>; }
-
-export class Navybird<T> extends Promise<T> {
-  static map: NavybirdMap = map as any
-  static delay: NavybirdDelay = delay as any
-}
