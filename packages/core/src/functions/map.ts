@@ -37,6 +37,7 @@ export function map<R, U>(
       throw new TypeError(
         `Mapper is not function`
       );
+      // TODO:
       // return resolve(
       //   utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn))
       // );

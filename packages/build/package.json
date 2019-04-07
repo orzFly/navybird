@@ -1,0 +1,22 @@
+{
+  "name": "@navybird/build",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "author": "Yeechan Lu",
+  "devDependencies": {
+    "@types/node": "^11.13.0",
+    "tslint": "^5.15.0",
+    "typescript": "^3.4.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cleanbuild": "yarn clean && yarn build",
+    "cleanwatch": "yarn clean && yarn watch",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+  }
+}

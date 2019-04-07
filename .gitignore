@@ -3,6 +3,7 @@ node_modules/
 
 # build and test
 build/
+!packages/build/
 packages/*/dist/
 /packages/*/esm
 coverage/
