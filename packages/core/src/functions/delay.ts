@@ -13,6 +13,7 @@ export function delay(
   value?: any
 ): GenericPromise<any> {
   const Promise = getPromiseConstructor(this);
+
   return new Promise(function delayPromiseExecutor(resolve) {
     setTimeout(function delayTimeoutCallback() {
       resolve(value);
