@@ -1,4 +1,4 @@
-import { getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
 import { isPromise } from './isPromise';
 
 export interface ConcurrencyOption {
@@ -17,14 +17,14 @@ export function map<R, U>(
   iterable: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
   mapper: (item: R, index: number) => U | PromiseLike<U>,
   opts: ConcurrencyOption
-): PromiseLike<U[]> {
+): GenericPromise<U[]> {
   const Promise = getPromiseConstructor(this);
 
   return new Promise(function mapPromiseExecutor(resolve, reject) {
     if (isPromise(iterable)) {
       return resolve(
         iterable.then(function mapIterableFulfilled(val) {
-          return map(val, mapper, opts);
+          return map(val, mapper, opts) as PromiseLike<U[]>;
         })
       );
     }
