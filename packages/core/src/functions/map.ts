@@ -1,5 +1,6 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
 import { isPromiseLike } from './isPromiseLike';
+import { Resolvable } from '../helpers/resolvable';
 
 export interface ConcurrencyOption {
   concurrency: number;
@@ -14,8 +15,8 @@ export interface ConcurrencyOption {
  * *The original array is not modified.*
  */
 export function map<R, U>(
-  iterable: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
-  mapper: (item: R, index: number) => U | PromiseLike<U>,
+  iterable: PromiseLike<Iterable<Resolvable<R>>> | Iterable<Resolvable<R>>,
+  mapper: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>,
   opts?: ConcurrencyOption
 ): GenericPromise<U[]> {
   const Promise = getPromiseConstructor(this);
@@ -52,6 +53,7 @@ export function map<R, U>(
     }
 
     const ret: U[] = [];
+    const length = (iterable as any).length;
     const iterator = iterable[Symbol.iterator]();
     let isRejected = false;
     let iterableDone = false;
@@ -75,7 +77,7 @@ export function map<R, U>(
 
       Promise.resolve(nextItem.value)
         .then(function mapMapperWrapper(el) {
-          return mapper(el, i);
+          return mapper(el, i, length);
         })
         .then(
           function mapResolvedCallback(val) {

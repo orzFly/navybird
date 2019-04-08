@@ -1,10 +1,12 @@
 import { Defer, defer } from './functions/defer';
 import { delay } from './functions/delay';
 import { fromCallback, FromCallbackOptions } from './functions/fromCallback';
+import { immediate } from './functions/immediate';
 import { isPromise } from './functions/isPromise';
 import { isPromiseLike } from './functions/isPromiseLike';
 import { ConcurrencyOption, map } from './functions/map';
-import { immediate } from './functions/immediate';
+import { reduce } from './functions/reduce';
+import { Resolvable } from './helpers/resolvable';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -16,6 +18,7 @@ export class Navybird<T> extends Promise<T> {
   static fromCallback: NavybirdFromCallbackFunction = fromCallback as any
   static fromNode: NavybirdFromCallbackFunction = fromCallback as any
   static map: NavybirdMapFunction = map as any
+  static reduce: NavybirdReduceFunction = reduce as any
 }
 
 export class NavybirdDefer<T> extends Defer<T> {
@@ -50,4 +53,10 @@ type NavybirdFromCallbackFunction = { (resolver: (callback: (err: any, result?: 
  * @$TypeExpand typeof map
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdMapFunction = <R, U>(iterable: Iterable<R | PromiseLike<R>> | PromiseLike<Iterable<R | PromiseLike<R>>>, mapper: (item: R, index: number) => U | PromiseLike<U>, opts?: ConcurrencyOption) => Navybird<U[]>
+type NavybirdMapFunction = <R, U>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>, opts?: ConcurrencyOption) => Navybird<U[]>
+
+/**
+ * @$TypeExpand typeof reduce
+ * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+ */
+type NavybirdReduceFunction = { <R, U>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => U | PromiseLike<U>, initialValue?: U): Navybird<U>; <R>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; }

@@ -1,0 +1,1 @@
+export type Resolvable<R> = R | PromiseLike<R>;
