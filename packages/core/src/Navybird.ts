@@ -9,6 +9,7 @@ import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { reduce } from './functions/reduce';
 import { Resolvable } from './helpers/types';
+import { timeout } from './functions/timeout';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -24,6 +25,8 @@ export class Navybird<T> extends Promise<T> {
   static map: NavybirdMapFunction = map as any
   static mapSeries: NavybirdMapSeriesFunction = mapSeries as any
   static reduce: NavybirdReduceFunction = reduce as any
+
+  timeout!: NavybirdInstanceTimeoutFunction
 
   // #region Original Methods
 
@@ -164,4 +167,14 @@ type NavybirdMapSeriesFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable
  */
 type NavybirdReduceFunction = { <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>, initialValue?: U): Navybird<U>; <R>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; }
 
+/**
+ * @$TypeExpand typeof timeout
+ * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+ */
+type NavybirdInstanceTimeoutFunction = { <T>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback?: string | Error): Navybird<T>; <T, R>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback: () => Resolvable<R>): Navybird<R>; }
+
 // #endregion
+
+Navybird.prototype.timeout = function () {
+  return timeout.call(this.promise.constructor, this, ...arguments);
+} as any
