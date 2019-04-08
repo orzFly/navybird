@@ -31,3 +31,5 @@ lerna-debug.log
 docs
 lint-results.json
 cache/
+
+/.vscode
