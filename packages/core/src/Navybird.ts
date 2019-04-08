@@ -4,6 +4,7 @@ import { fromCallback, FromCallbackOptions } from './functions/fromCallback';
 import { isPromise } from './functions/isPromise';
 import { isPromiseLike } from './functions/isPromiseLike';
 import { ConcurrencyOption, map } from './functions/map';
+import { immediate } from './functions/immediate';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -11,7 +12,9 @@ export class Navybird<T> extends Promise<T> {
 
   static defer: NavybirdDeferFunction = defer as any
   static delay: NavybirdDelayFunction = delay as any
+  static immediate: NavybirdImmediateFunction = immediate as any
   static fromCallback: NavybirdFromCallbackFunction = fromCallback as any
+  static fromNode: NavybirdFromCallbackFunction = fromCallback as any
   static map: NavybirdMapFunction = map as any
 }
 
@@ -30,6 +33,12 @@ type NavybirdDeferFunction = <T = any>() => NavybirdDefer<T>
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
 type NavybirdDelayFunction = { <R>(ms: number, value: R | PromiseLike<R>): Navybird<R>; (ms: number): Navybird<void>; }
+
+/**
+ * @$TypeExpand typeof immediate
+ * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+ */
+type NavybirdImmediateFunction = { <R>(value: R | PromiseLike<R>): Navybird<R>; (): Navybird<void>; }
 
 /**
  * @$TypeExpand typeof fromCallback
