@@ -1,5 +1,5 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
-import { Resolvable } from '../helpers/resolvable';
+import { Resolvable } from '../helpers/types';
 
 /**
  * Returns a promise that will be resolved with value (or undefined) after given ms milliseconds.

@@ -1,4 +1,4 @@
-import { Resolvable } from '../helpers/resolvable';
+import { Resolvable } from '../helpers/types';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
 import { reduce } from './reduce';
 

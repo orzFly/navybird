@@ -7,7 +7,7 @@ import { isPromiseLike } from './functions/isPromiseLike';
 import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { reduce } from './functions/reduce';
-import { Resolvable } from './helpers/resolvable';
+import { Resolvable } from './helpers/types';
 import { eachSeries } from './functions/eachSeries';
 
 export class Navybird<T> extends Promise<T> {

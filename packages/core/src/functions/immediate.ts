@@ -1,5 +1,5 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
-import { Resolvable } from '../helpers/resolvable';
+import { Resolvable } from '../helpers/types';
 
 export function immediate<R>(value: Resolvable<R>): GenericPromise<R>;
 export function immediate(): GenericPromise<void>;
