@@ -1,4 +1,5 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { Resolvable } from '../helpers/resolvable';
 
 export class Defer<T> {
   constructor(Promise?: PromiseConstructor) {
@@ -15,7 +16,7 @@ export class Defer<T> {
   }
 
   public readonly promise!: GenericPromise<T>
-  public readonly resolve!: (value?: T | PromiseLike<T>) => void
+  public readonly resolve!: (value?: Resolvable<T>) => void
   public readonly reject!: (reason?: any) => void
 
   get fulfill() {

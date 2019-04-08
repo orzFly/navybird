@@ -35,13 +35,13 @@ type NavybirdDeferFunction = <T = any>() => NavybirdDefer<T>
  * @$TypeExpand typeof delay
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdDelayFunction = { <R>(ms: number, value: R | PromiseLike<R>): Navybird<R>; (ms: number): Navybird<void>; }
+type NavybirdDelayFunction = { <R>(ms: number, value: Resolvable<R>): Navybird<R>; (ms: number): Navybird<void>; }
 
 /**
  * @$TypeExpand typeof immediate
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdImmediateFunction = { <R>(value: R | PromiseLike<R>): Navybird<R>; (): Navybird<void>; }
+type NavybirdImmediateFunction = { <R>(value: Resolvable<R>): Navybird<R>; (): Navybird<void>; }
 
 /**
  * @$TypeExpand typeof fromCallback
@@ -53,10 +53,10 @@ type NavybirdFromCallbackFunction = { (resolver: (callback: (err: any, result?: 
  * @$TypeExpand typeof map
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdMapFunction = <R, U>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => U | PromiseLike<U>, opts?: ConcurrencyOption) => Navybird<U[]>
+type NavybirdMapFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>, opts?: ConcurrencyOption) => Navybird<U[]>
 
 /**
  * @$TypeExpand typeof reduce
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdReduceFunction = { <R, U>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => U | PromiseLike<U>, initialValue?: U): Navybird<U>; <R>(iterable: Iterable<Resolvable<R>> | PromiseLike<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; }
+type NavybirdReduceFunction = { <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>, initialValue?: U): Navybird<U>; <R>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; }

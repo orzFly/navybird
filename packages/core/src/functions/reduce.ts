@@ -13,19 +13,19 @@ import { isPromiseLike } from './isPromiseLike';
  */
 
 export function reduce<R, U>(
-  iterable: PromiseLike<Iterable<Resolvable<R>>> | Iterable<Resolvable<R>>,
-  reducer: (memo: U, current: R, index: number, arrayLength: number) => U | PromiseLike<U>,
+  iterable: Resolvable<Iterable<Resolvable<R>>>,
+  reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>,
   initialValue?: U
 ): GenericPromise<U>
 
 export function reduce<R>(
-  iterable: PromiseLike<Iterable<Resolvable<R>>> | Iterable<Resolvable<R>>,
-  reducer: (memo: R, current: R, index: number, arrayLength: number) => R | PromiseLike<R>,
+  iterable: Resolvable<Iterable<Resolvable<R>>>,
+  reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>,
 ): GenericPromise<R>
 
 export function reduce<R, U>(
-  iterable: PromiseLike<Iterable<Resolvable<R>>> | Iterable<Resolvable<R>>,
-  reducer: (memo: U, current: R, index: number, arrayLength: number) => U | PromiseLike<U>,
+  iterable: Resolvable<Iterable<Resolvable<R>>>,
+  reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>,
   initialValue?: U
 ): GenericPromise<U> {
   const Promise = getPromiseConstructor(this);
