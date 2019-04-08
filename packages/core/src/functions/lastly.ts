@@ -1,6 +1,6 @@
 import { Resolvable, PromiseLikeValueType } from '../helpers/types';
 
-export function lastly<P extends PromiseLike<any>>(promise: P, handler: () => Resolvable<any>): P {
+export function lastly<P extends PromiseLike<any>>(promise: P, handler: () => Resolvable<void | undefined | null | any>): P {
   handler = handler || function () { };
 
   return promise.then<PromiseLikeValueType<P>, never>(
@@ -22,4 +22,3 @@ export function lastly<P extends PromiseLike<any>>(promise: P, handler: () => Re
 }
 
 export { lastly as finally };
-

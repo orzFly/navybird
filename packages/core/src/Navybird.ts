@@ -10,6 +10,7 @@ import { mapSeries } from './functions/mapSeries';
 import { reduce } from './functions/reduce';
 import { Resolvable } from './helpers/types';
 import { timeout } from './functions/timeout';
+import { lastly } from './functions/lastly';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -27,6 +28,8 @@ export class Navybird<T> extends Promise<T> {
   static reduce: NavybirdReduceFunction = reduce as any
 
   timeout!: NavybirdInstanceTimeoutFunction
+  lastly!: NavybirdInstanceLastlyFunction
+  finally!: NavybirdInstanceLastlyFunction
 
   // #region Original Methods
 
@@ -173,8 +176,18 @@ type NavybirdReduceFunction = { <R, U>(iterable: Resolvable<Iterable<Resolvable<
  */
 type NavybirdInstanceTimeoutFunction = { <T>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback?: string | Error): Navybird<T>; <T, R>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback: () => Resolvable<R>): Navybird<R>; }
 
+/**
+ * @$TypeExpand typeof lastly
+ * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+ */
+type NavybirdInstanceLastlyFunction = <P extends PromiseLike<any>>(this: P, handler: () => any) => P
+
 // #endregion
 
 Navybird.prototype.timeout = function () {
-  return timeout.call(this.promise.constructor, this, ...arguments);
+  return timeout.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.lastly = function () {
+  return lastly.call(this.constructor, this, ...arguments);
 } as any
