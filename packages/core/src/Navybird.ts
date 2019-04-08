@@ -8,6 +8,7 @@ import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { reduce } from './functions/reduce';
 import { Resolvable } from './helpers/resolvable';
+import { eachSeries } from './functions/eachSeries';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -15,6 +16,8 @@ export class Navybird<T> extends Promise<T> {
 
   static defer: NavybirdDeferFunction = defer as any
   static delay: NavybirdDelayFunction = delay as any
+  static each: NavybirdEachSeriesFunction = eachSeries as any
+  static eachSeries: NavybirdEachSeriesFunction = eachSeries as any
   static immediate: NavybirdImmediateFunction = immediate as any
   static fromCallback: NavybirdFromCallbackFunction = fromCallback as any
   static fromNode: NavybirdFromCallbackFunction = fromCallback as any
@@ -38,6 +41,12 @@ type NavybirdDeferFunction = <T = any>() => NavybirdDefer<T>
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
 type NavybirdDelayFunction = { <R>(ms: number, value: Resolvable<R>): Navybird<R>; (ms: number): Navybird<void>; }
+
+/**
+ * @$TypeExpand typeof eachSeries
+ * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+ */
+type NavybirdEachSeriesFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]>
 
 /**
  * @$TypeExpand typeof immediate

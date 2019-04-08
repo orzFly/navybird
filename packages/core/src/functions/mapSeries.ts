@@ -29,7 +29,7 @@ export function mapSeries<R, U>(
         );
       },
       {}
-    ).then(function mapSeriesResult(val) {
+    ).then(function mapSeriesResult() {
       return ret
     })
   );
