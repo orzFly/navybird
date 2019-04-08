@@ -41,4 +41,4 @@ type NavybirdFromCallbackFunction = { (resolver: (callback: (err: any, result?: 
  * @$TypeExpand typeof map
  * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
  */
-type NavybirdMapFunction = <R, U>(iterable: Iterable<R | PromiseLike<R>> | PromiseLike<Iterable<R | PromiseLike<R>>>, mapper: (item: R, index: number) => U | PromiseLike<U>, opts: ConcurrencyOption) => Navybird<U[]>
+type NavybirdMapFunction = <R, U>(iterable: Iterable<R | PromiseLike<R>> | PromiseLike<Iterable<R | PromiseLike<R>>>, mapper: (item: R, index: number) => U | PromiseLike<U>, opts?: ConcurrencyOption) => Navybird<U[]>

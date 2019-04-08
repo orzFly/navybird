@@ -16,7 +16,7 @@ export interface ConcurrencyOption {
 export function map<R, U>(
   iterable: PromiseLike<Iterable<PromiseLike<R> | R>> | Iterable<PromiseLike<R> | R>,
   mapper: (item: R, index: number) => U | PromiseLike<U>,
-  opts: ConcurrencyOption
+  opts?: ConcurrencyOption
 ): GenericPromise<U[]> {
   const Promise = getPromiseConstructor(this);
 
