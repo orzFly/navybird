@@ -27,10 +27,83 @@ export class Navybird<T> extends Promise<T> {
   static mapSeries: NavybirdMapSeriesFunction = mapSeries as any
   static reduce: NavybirdReduceFunction = reduce as any
 
-  timeout!: NavybirdInstanceTimeoutFunction
-  lastly!: NavybirdInstanceLastlyFunction
-  finally!: NavybirdInstanceLastlyFunction
+  // #region Instance Methods
 
+  // FIXME: .catch
+
+  caught!: Navybird<T>['catch'];
+
+  // FIXME: .error
+
+  finally!: NavybirdInstanceLastlyFunction
+  lastly!: NavybirdInstanceLastlyFunction
+
+  tap<U>(onFulFill: (value: T) => Resolvable<U>) {
+    return this.then(function tapHandle(val) {
+      return Promise
+        .resolve(val)
+        .then(onFulFill)
+        .then(function tapReturnValue() {
+          return val;
+        });
+    });
+  }
+
+  // FIXME: .tapCatch
+
+  delay(ms: number) {
+    return this.tap(function delayValue() {
+      return delay(ms);
+    });
+  }
+
+  immediate() {
+    return this.tap(immediate);
+  }
+
+  timeout!: NavybirdInstanceTimeoutFunction
+
+  // FIXME: nodeify, asCallback
+
+  // FIXME: reflect
+
+  return(): Navybird<void>;
+  return<U>(value: U): Navybird<U>;
+  return(value?: any) {
+    return this.then(function thenReturnValue() {
+      return value;
+    });
+  }
+
+  thenReturn(): Navybird<void>;
+  thenReturn<U>(value: U): Navybird<U>;
+  thenReturn(value?: any) {
+    return this.then(function thenReturnValue() {
+      return value;
+    });
+  }
+
+  throw(reason: Error): Navybird<never> {
+    return this.then(function thenThrowReason() {
+      throw reason;
+    });
+  }
+
+  thenThrow(reason: Error): Navybird<never> {
+    return this.then(function thenThrowReason() {
+      throw reason;
+    });
+  }
+
+  // FIXME: catchReturn, catchThrow
+  // FIXME: spread
+  // FIXME: all
+  // FIXME: map
+  // FIXME: reduce
+  // FIXME: each
+  // FIXME: eachSeries
+  // FIXME: mapSeries
+  
   // #region Original Methods
 
   /**
@@ -195,3 +268,5 @@ Navybird.prototype.lastly = function () {
 Navybird.prototype.finally = function () {
   return lastly.call(this.constructor, this, ...arguments);
 } as any
+
+Navybird.prototype.caught = Navybird.prototype.catch;
