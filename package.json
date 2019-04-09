@@ -3,7 +3,9 @@
   "scripts": {
     "build": "lerna run --stream --concurrency 1 --sort build",
     "watch": "lerna run watch --stream --no-sort --concurrency 9999",
-    "clean": "lerna run --stream clean",
+    "clean": "run-s clean:root clean:sub",
+    "clean:sub": "lerna run --stream clean",
+    "clean:root": "rimraf coverage",
     "fix": "lerna run --stream --concurrency 1 fix",
     "lint": "lerna run --stream --concurrency 1 lint",
     "lint:json": "lerna run --stream --concurrency 1 lint:tslint:json",
