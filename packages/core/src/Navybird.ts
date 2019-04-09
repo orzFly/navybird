@@ -16,16 +16,65 @@ export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
 
-  static defer: NavybirdDeferFunction = defer as any
-  static delay: NavybirdDelayFunction = delay as any
-  static each: NavybirdEachSeriesFunction = eachSeries as any
-  static eachSeries: NavybirdEachSeriesFunction = eachSeries as any
-  static immediate: NavybirdImmediateFunction = immediate as any
-  static fromCallback: NavybirdFromCallbackFunction = fromCallback as any
-  static fromNode: NavybirdFromCallbackFunction = fromCallback as any
-  static map: NavybirdMapFunction = map as any
-  static mapSeries: NavybirdMapSeriesFunction = mapSeries as any
-  static reduce: NavybirdReduceFunction = reduce as any
+  /**
+   * @$TypeExpand typeof defer
+   * @$$Eval (str) => str.replace(/Defer</g, "NavybirdDefer<")
+   */
+  static defer: <T = any>() => NavybirdDefer<T> = defer as any
+
+  /**
+   * @$TypeExpand typeof delay
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static delay: { <R>(ms: number, value: Resolvable<R>): Navybird<R>; (ms: number): Navybird<void>; } = delay as any
+
+  /**
+   * @$TypeExpand typeof eachSeries
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static each: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = eachSeries as any
+
+  /**
+   * @$TypeExpand typeof eachSeries
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static eachSeries: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]> = eachSeries as any
+
+  /**
+   * @$TypeExpand typeof immediate
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static immediate: { <R>(value: Resolvable<R>): Navybird<R>; (): Navybird<void>; } = immediate as any
+
+  /**
+   * @$TypeExpand typeof fromCallback
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static fromCallback: { (resolver: (callback: (err: any, result?: any) => void) => void, options?: FromCallbackOptions): Navybird<any>; <T>(resolver: (callback: (err: any, result?: T) => void) => void, options?: FromCallbackOptions): Navybird<T>; } = fromCallback as any
+
+  /**
+   * @$TypeExpand typeof fromCallback
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static fromNode: { (resolver: (callback: (err: any, result?: any) => void) => void, options?: FromCallbackOptions): Navybird<any>; <T>(resolver: (callback: (err: any, result?: T) => void) => void, options?: FromCallbackOptions): Navybird<T>; } = fromCallback as any
+
+  /**
+   * @$TypeExpand typeof map
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static map: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>, opts?: ConcurrencyOption) => Navybird<U[]> = map as any
+
+  /**
+   * @$TypeExpand typeof mapSeries
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static mapSeries: <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<U[]> = mapSeries as any
+
+  /**
+   * @$TypeExpand typeof reduce
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static reduce: { <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>, initialValue?: U): Navybird<U>; <R>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; } = reduce as any
 
   // #region Instance Methods
 
@@ -35,8 +84,17 @@ export class Navybird<T> extends Promise<T> {
 
   // FIXME: .error
 
-  finally!: NavybirdInstanceLastlyFunction
-  lastly!: NavybirdInstanceLastlyFunction
+  /**
+   * @$TypeExpand typeof lastly
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  finally!: <P extends PromiseLike<any>>(this: P, handler: () => any) => P
+
+  /**
+   * @$TypeExpand typeof lastly
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  lastly!: <P extends PromiseLike<any>>(this: P, handler: () => any) => P
 
   tap<U>(onFulFill: (value: T) => Resolvable<U>) {
     return this.then(function tapHandle(val) {
@@ -61,7 +119,11 @@ export class Navybird<T> extends Promise<T> {
     return this.tap(immediate);
   }
 
-  timeout!: NavybirdInstanceTimeoutFunction
+  /**
+   * @$TypeExpand typeof timeout
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  timeout!: { <T>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback?: string | Error): Navybird<T>; <T, R>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback: () => Resolvable<R>): Navybird<R>; }
 
   // FIXME: nodeify, asCallback
 
@@ -192,70 +254,6 @@ export class Navybird<T> extends Promise<T> {
 export class NavybirdDefer<T> extends Defer<T> {
   public readonly promise!: Navybird<T>
 }
-
-// #region Generated Types
-
-/**
- * @$TypeExpand typeof defer
- * @$$Eval (str) => str.replace(/Defer</g, "NavybirdDefer<")
- */
-type NavybirdDeferFunction = <T = any>() => NavybirdDefer<T>
-
-/**
- * @$TypeExpand typeof delay
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdDelayFunction = { <R>(ms: number, value: Resolvable<R>): Navybird<R>; (ms: number): Navybird<void>; }
-
-/**
- * @$TypeExpand typeof eachSeries
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdEachSeriesFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<R[]>
-
-/**
- * @$TypeExpand typeof immediate
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdImmediateFunction = { <R>(value: Resolvable<R>): Navybird<R>; (): Navybird<void>; }
-
-/**
- * @$TypeExpand typeof fromCallback
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdFromCallbackFunction = { (resolver: (callback: (err: any, result?: any) => void) => void, options?: FromCallbackOptions): Navybird<any>; <T>(resolver: (callback: (err: any, result?: T) => void) => void, options?: FromCallbackOptions): Navybird<T>; }
-
-/**
- * @$TypeExpand typeof map
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdMapFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, mapper: (item: R, index: number, arrayLength: number) => Resolvable<U>, opts?: ConcurrencyOption) => Navybird<U[]>
-
-/**
- * @$TypeExpand typeof mapSeries
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdMapSeriesFunction = <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, iterator: (item: R, index: number, arrayLength: number) => Resolvable<U>) => Navybird<U[]>
-
-/**
- * @$TypeExpand typeof reduce
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
- */
-type NavybirdReduceFunction = { <R, U>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: U, current: R, index: number, arrayLength: number) => Resolvable<U>, initialValue?: U): Navybird<U>; <R>(iterable: Resolvable<Iterable<Resolvable<R>>>, reducer: (memo: R, current: R, index: number, arrayLength: number) => Resolvable<R>): Navybird<R>; }
-
-/**
- * @$TypeExpand typeof timeout
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
- */
-type NavybirdInstanceTimeoutFunction = { <T>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback?: string | Error): Navybird<T>; <T, R>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback: () => Resolvable<R>): Navybird<R>; }
-
-/**
- * @$TypeExpand typeof lastly
- * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
- */
-type NavybirdInstanceLastlyFunction = <P extends PromiseLike<any>>(this: P, handler: () => any) => P
-
-// #endregion
 
 Navybird.prototype.timeout = function () {
   return timeout.call(this.constructor, this, ...arguments);

@@ -30,7 +30,7 @@ const visitor: ts.Visitor = (node) => {
   for (const doc of docs) {
     if (doc.tagName.text !== '$TypeExpand') continue;
 
-    if (ts.isTypeAliasDeclaration(node)) {
+    if (ts.isTypeAliasDeclaration(node) || ts.isPropertyDeclaration(node)) {
       const text = applyReplacements(node.getSourceFile().getText(), [{
         start: node.type.getStart(),
         end: node.type.getEnd(),
