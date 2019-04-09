@@ -191,3 +191,7 @@ Navybird.prototype.timeout = function () {
 Navybird.prototype.lastly = function () {
   return lastly.call(this.constructor, this, ...arguments);
 } as any
+
+Navybird.prototype.finally = function () {
+  return lastly.call(this.constructor, this, ...arguments);
+} as any
