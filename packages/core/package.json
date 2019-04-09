@@ -1,7 +1,7 @@
 {
   "name": "@navybird/core",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "private": true,
   "author": "Yeechan Lu",
