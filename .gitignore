@@ -6,6 +6,7 @@ build/
 !packages/build/
 packages/*/dist/
 /packages/*/esm
+.nyc_output/
 coverage/
 scratch/
 *.pyc
@@ -33,4 +34,3 @@ lint-results.json
 cache/
 
 /.vscode
-/.nyc_output

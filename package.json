@@ -8,18 +8,27 @@
     "lint": "lerna run --stream --concurrency 1 lint",
     "lint:json": "lerna run --stream --concurrency 1 lint:tslint:json",
     "test": "lerna run --stream --concurrency 1 --sort test",
-    "coverage": "nyc report --reporter=html",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "run-s coverage:gather coverage:report",
+    "coverage:gather": "lerna run --stream --concurrency 1 --sort coverage",
+    "coverage:report": "genhtml -o coverage packages/**/coverage/*.lcov.txt"
   },
   "workspaces": [
     "packages/*"
   ],
+  "nyc": {
+    "source-map": true,
+    "produce-source-map": true,
+    "require": [
+      "source-map-support/register"
+    ]
+  },
   "devDependencies": {
     "coveralls": "^3.0.3",
     "lerna": "^3.13.2",
     "npm-run-all": "^4.1.2",
     "nyc": "^13.3.0",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.6.3",
+    "source-map-support": "^0.5.12"
   },
   "name": "navybird-mono"
 }
