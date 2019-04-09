@@ -59,7 +59,11 @@ const visitor: ts.Visitor = (node) => {
       ts.forEachChild(tmpSrc, nodeFinder);
 
       const tmpType = tmpChecker.getTypeAtLocation(foundNode.name);
-      let replace = tmpChecker.typeToString(tmpType, undefined, ts.TypeFormatFlags.NoTruncation);
+      let replace = tmpChecker.typeToString(
+        tmpType,
+        undefined,
+        ts.TypeFormatFlags.NoTruncation
+      );
 
       const evalDoc = docs.find((i) => i.tagName.text === '$$Eval')
       if (evalDoc) {

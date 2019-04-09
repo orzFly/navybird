@@ -2,10 +2,11 @@ import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseCons
 import { Resolvable } from '../helpers/types';
 
 export class Defer<T> {
-  constructor(Promise?: PromiseConstructor) {
-    let _resolve: this['resolve']
-    let _reject: this['reject']
+  constructor(promiseConstructor?: PromiseConstructor) {
+    let _resolve!: this['resolve']
+    let _reject!: this['reject']
 
+    Promise = getPromiseConstructor(promiseConstructor);
     this.promise = new Promise(function deferCapturePromiseExecutor(resolve, reject) {
       _resolve = resolve;
       _reject = reject;
