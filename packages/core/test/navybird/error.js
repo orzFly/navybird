@@ -1,6 +1,6 @@
 "use strict";
 const assert = require("assert");
-const Promise = require("../../index");
+const Promise = require("../..");
 
 describe("Promise.prototype.error", function() {
   describe("catches stuff originating from explicit rejections", function() {
