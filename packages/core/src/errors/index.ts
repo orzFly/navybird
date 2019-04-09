@@ -1,0 +1,1 @@
+export { TypeError } from './TypeError';

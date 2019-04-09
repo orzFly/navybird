@@ -11,6 +11,7 @@ import { reduce } from './functions/reduce';
 import { Resolvable } from './helpers/types';
 import { timeout } from './functions/timeout';
 import { lastly } from './functions/lastly';
+import * as errors from './errors';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -230,6 +231,11 @@ export class Navybird<T> extends Promise<T> {
   };
 
   // #endregion
+}
+
+export namespace Navybird {
+  export const TypeError = errors.TypeError;
+  export type TypeError = typeof TypeError;
 }
 
 export class NavybirdDefer<T> extends Defer<T> {
