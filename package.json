@@ -7,15 +7,19 @@
     "fix": "lerna run --stream --concurrency 1 fix",
     "lint": "lerna run --stream --concurrency 1 lint",
     "lint:json": "lerna run --stream --concurrency 1 lint:tslint:json",
-    "test": "lerna run --stream --concurrency 1 --sort test"
+    "test": "lerna run --stream --concurrency 1 --sort test",
+    "coverage": "nyc report --reporter=html",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "lerna": "^3.5.0",
+    "coveralls": "^3.0.3",
+    "lerna": "^3.13.2",
     "npm-run-all": "^4.1.2",
-    "rimraf": "^2.6.2"
+    "nyc": "^13.3.0",
+    "rimraf": "^2.6.3"
   },
   "name": "navybird-mono"
 }

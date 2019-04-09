@@ -33,3 +33,4 @@ lint-results.json
 cache/
 
 /.vscode
+/.nyc_output
