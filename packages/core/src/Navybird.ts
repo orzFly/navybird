@@ -193,11 +193,22 @@ export class Navybird<T> extends Promise<T> {
   all(): Navybird<any> {
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function allOnFulfilled(val: any) {
-      return promiseConstructor.all(val);
+      return promiseConstructor.all.call(promiseConstructor, val, ...arguments);
     });
   }
 
-  // FIXME: map
+  /**
+   * Same as calling `Promise.map(thisPromise, mapper)`.
+   */
+  map<U, Q>(this: Navybird<T & Iterable<Q>>, mapper: (item: Q, index: number, arrayLength: number) => Resolvable<U>, options?: ConcurrencyOption): Navybird<U[]>;
+
+  map(): Navybird<any> {
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function mapOnFulfilled(val: any) {
+      return promiseConstructor.map.call(promiseConstructor, val, ...arguments);
+    });
+  }
+
   // FIXME: reduce
   // FIXME: each
   // FIXME: eachSeries
