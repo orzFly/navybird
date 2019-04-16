@@ -224,7 +224,18 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
-  // FIXME: reduce
+  /**
+   * Same as calling `Promise.reduce(thisPromise, Function reducer, initialValue)`.
+   */
+  reduce<U, Q>(this: Navybird<T & Iterable<Q>>, reducer: (memo: U, item: Q, index: number, arrayLength: number) => Resolvable<U>, initialValue?: U): Navybird<U>;
+
+  reduce(): Navybird<any> {
+    const args = arguments
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function reduceOnFulfilled(val: any) {
+      return promiseConstructor.reduce.call(promiseConstructor, val, ...args);
+    });
+  }
 
   /**
    * Same as calling ``Promise.each(thisPromise, iterator)``.
