@@ -266,6 +266,11 @@ export class Navybird<T> extends Promise<T> {
   };
 
   // #endregion
+
+  static cast: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
+  static fulfilled: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
+  static rejected: typeof Navybird['reject'] = Navybird.reject.bind(Navybird)
+  static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
 }
 
 export namespace Navybird {
