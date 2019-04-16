@@ -6,6 +6,7 @@ import { fromCallback, FromCallbackOptions } from './functions/fromCallback';
 import { immediate } from './functions/immediate';
 import { isPromise } from './functions/isPromise';
 import { isPromiseLike } from './functions/isPromiseLike';
+import { join } from './functions/join';
 import { lastly } from './functions/lastly';
 import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
@@ -59,6 +60,12 @@ export class Navybird<T> extends Promise<T> {
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
    */
   static fromNode: { (resolver: (callback: (err: any, result?: any) => void) => void, options?: FromCallbackOptions): Navybird<any>; <T>(resolver: (callback: (err: any, result?: T) => void) => void, options?: FromCallbackOptions): Navybird<T>; } = fromCallback as any
+
+  /**
+   * @$TypeExpand typeof join
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird")
+   */
+  static join: { <R, A1>(arg1: Resolvable<A1>, handler: (arg1: A1) => Resolvable<R>): Navybird<R>; <R, A1, A2>(arg1: Resolvable<A1>, arg2: Resolvable<A2>, handler: (arg1: A1, arg2: A2) => Resolvable<R>): Navybird<R>; <R, A1, A2, A3>(arg1: Resolvable<A1>, arg2: Resolvable<A2>, arg3: Resolvable<A3>, handler: (arg1: A1, arg2: A2, arg3: A3) => Resolvable<R>): Navybird<R>; <R, A1, A2, A3, A4>(arg1: Resolvable<A1>, arg2: Resolvable<A2>, arg3: Resolvable<A3>, arg4: Resolvable<A4>, handler: (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Resolvable<R>): Navybird<R>; <R, A1, A2, A3, A4, A5>(arg1: Resolvable<A1>, arg2: Resolvable<A2>, arg3: Resolvable<A3>, arg4: Resolvable<A4>, arg5: Resolvable<A5>, handler: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Resolvable<R>): Navybird<R>; <R>(...values: Resolvable<R>[]): Navybird<R[]>; } = join as any
 
   /**
    * @$TypeExpand typeof map
