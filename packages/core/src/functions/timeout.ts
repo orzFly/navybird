@@ -1,6 +1,7 @@
+import { TimeoutError, TypeError } from '../errors';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
-import { lastly } from './lastly';
 import { Resolvable } from '../helpers/types';
+import { lastly } from './lastly';
 
 export function timeout<T>(
   promise: PromiseLike<T> | (PromiseLike<T> & { cancel(): any }),
@@ -41,7 +42,7 @@ export function timeout<T>(
           ? fallback
           : `Promise timed out after ${ms} milliseconds`;
       const err =
-        fallback instanceof Error ? fallback : new Error/* FIXME: TimeoutError */(message);
+        fallback instanceof Error ? fallback : new TimeoutError(message);
 
       if ('cancel' in promise && typeof promise.cancel === "function") {
         promise.cancel();

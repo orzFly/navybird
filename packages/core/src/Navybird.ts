@@ -162,7 +162,7 @@ export class Navybird<T> extends Promise<T> {
    */
   spread<U, Q>(this: Navybird<T & Iterable<Q>>, fulfilledHandler: (...values: Q[]) => Resolvable<U>): Navybird<U> {
     if (typeof fulfilledHandler !== "function") {
-      throw new TypeError(
+      throw new errors.TypeError(
         `fulfilledHandler is not function`
       );
     // TODO:
@@ -276,6 +276,9 @@ export class Navybird<T> extends Promise<T> {
 export namespace Navybird {
   export const TypeError = errors.TypeError;
   export type TypeError = typeof TypeError;
+
+  export const TimeoutError = errors.TimeoutError;
+  export type TimeoutError = typeof TimeoutError;
 }
 
 export class NavybirdDefer<T> extends Defer<T> {

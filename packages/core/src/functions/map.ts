@@ -1,6 +1,7 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
 import { isPromiseLike } from './isPromiseLike';
 import { Resolvable } from '../helpers/types';
+import { TypeError } from '../errors';
 
 export interface ConcurrencyOption {
   concurrency: number;
