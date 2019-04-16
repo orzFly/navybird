@@ -209,10 +209,43 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
+  /**
+   * Same as calling ``Promise.mapSeries(thisPromise, iterator)``.
+   */
+  mapSeries<U, Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<U>): Navybird<U[]>;
+
+  mapSeries(): Navybird<any> {
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function mapSeriesOnFulfilled(val: any) {
+      return promiseConstructor.mapSeries.call(promiseConstructor, val, ...arguments);
+    });
+  }
+
   // FIXME: reduce
-  // FIXME: each
-  // FIXME: eachSeries
-  // FIXME: mapSeries
+
+  /**
+   * Same as calling ``Promise.each(thisPromise, iterator)``.
+   */
+  each<Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<any>): Navybird<T>;
+
+  each(): Navybird<any> {
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function eachOnFulfilled(val: any) {
+      return promiseConstructor.each.call(promiseConstructor, val, ...arguments);
+    });
+  }
+
+  /**
+   * Same as calling ``Promise.eachSeries(thisPromise, iterator)``.
+   */
+  eachSeries<Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<any>): Navybird<T>;
+
+  eachSeries(): Navybird<any> {
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function eachSeriesOnFulfilled(val: any) {
+      return promiseConstructor.eachSeries.call(promiseConstructor, val, ...arguments);
+    });
+  }
 
   // #endregion
 
