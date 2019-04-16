@@ -157,7 +157,24 @@ export class Navybird<T> extends Promise<T> {
 
   // FIXME: catchReturn, catchThrow
   // FIXME: spread
-  // FIXME: all
+
+  /**
+   * Same as calling `Promise.all(thisPromise)`.
+   */
+  all(this: Navybird<Iterable<{}>>): Navybird<T>;
+
+  /**
+   * Same as calling `Promise.all(thisPromise)`.
+   */
+  all(): Navybird<never>;
+
+  all(): Navybird<any> {
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function allOnFulfilled(val: any) {
+      return promiseConstructor.all(val);
+    });
+  }
+
   // FIXME: map
   // FIXME: reduce
   // FIXME: each
