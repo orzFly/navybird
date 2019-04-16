@@ -156,7 +156,22 @@ export class Navybird<T> extends Promise<T> {
   }
 
   // FIXME: catchReturn, catchThrow
-  // FIXME: spread
+
+  /**
+   * Like calling `.then`, but the fulfillment value or rejection reason is assumed to be an array, which is flattened to the formal parameters of the handlers.
+   */
+  spread<U, Q>(this: Navybird<T & Iterable<Q>>, fulfilledHandler: (...values: Q[]) => Resolvable<U>): Navybird<U> {
+    if (typeof fulfilledHandler !== "function") {
+      throw new TypeError(
+        `fulfilledHandler is not function`
+      );
+    // TODO:
+      // return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
+    }
+    return this.then(function spreadOnFulfilled(val) {
+      return fulfilledHandler(...val);
+    });
+  }
 
   /**
    * Same as calling `Promise.all(thisPromise)`.
