@@ -191,9 +191,10 @@ export class Navybird<T> extends Promise<T> {
   all(): Navybird<never>;
 
   all(): Navybird<any> {
+    const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function allOnFulfilled(val: any) {
-      return promiseConstructor.all.call(promiseConstructor, val, ...arguments);
+      return promiseConstructor.all.call(promiseConstructor, val, ...args);
     });
   }
 
@@ -203,9 +204,10 @@ export class Navybird<T> extends Promise<T> {
   map<U, Q>(this: Navybird<T & Iterable<Q>>, mapper: (item: Q, index: number, arrayLength: number) => Resolvable<U>, options?: ConcurrencyOption): Navybird<U[]>;
 
   map(): Navybird<any> {
+    const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function mapOnFulfilled(val: any) {
-      return promiseConstructor.map.call(promiseConstructor, val, ...arguments);
+      return promiseConstructor.map.call(promiseConstructor, val, ...args);
     });
   }
 
@@ -215,9 +217,10 @@ export class Navybird<T> extends Promise<T> {
   mapSeries<U, Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<U>): Navybird<U[]>;
 
   mapSeries(): Navybird<any> {
+    const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function mapSeriesOnFulfilled(val: any) {
-      return promiseConstructor.mapSeries.call(promiseConstructor, val, ...arguments);
+      return promiseConstructor.mapSeries.call(promiseConstructor, val, ...args);
     });
   }
 
@@ -229,9 +232,10 @@ export class Navybird<T> extends Promise<T> {
   each<Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<any>): Navybird<T>;
 
   each(): Navybird<any> {
+    const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function eachOnFulfilled(val: any) {
-      return promiseConstructor.each.call(promiseConstructor, val, ...arguments);
+      return promiseConstructor.each.call(promiseConstructor, val, ...args);
     });
   }
 
@@ -241,9 +245,10 @@ export class Navybird<T> extends Promise<T> {
   eachSeries<Q>(this: Navybird<T & Iterable<Q>>, iterator: (item: Q, index: number, arrayLength: number) => Resolvable<any>): Navybird<T>;
 
   eachSeries(): Navybird<any> {
+    const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
     return this.then(function eachSeriesOnFulfilled(val: any) {
-      return promiseConstructor.eachSeries.call(promiseConstructor, val, ...arguments);
+      return promiseConstructor.eachSeries.call(promiseConstructor, val, ...args);
     });
   }
 
