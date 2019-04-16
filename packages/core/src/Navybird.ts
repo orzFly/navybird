@@ -195,7 +195,9 @@ export class Navybird<T> extends Promise<T> {
   // FIXME: each
   // FIXME: eachSeries
   // FIXME: mapSeries
-  
+
+  // #endregion
+
   // #region Original Methods
 
   /**
