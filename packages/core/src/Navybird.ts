@@ -1,3 +1,4 @@
+import * as errors from './errors';
 import { Defer, defer } from './functions/defer';
 import { delay } from './functions/delay';
 import { eachSeries } from './functions/eachSeries';
@@ -5,13 +6,13 @@ import { fromCallback, FromCallbackOptions } from './functions/fromCallback';
 import { immediate } from './functions/immediate';
 import { isPromise } from './functions/isPromise';
 import { isPromiseLike } from './functions/isPromiseLike';
+import { lastly } from './functions/lastly';
 import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { reduce } from './functions/reduce';
-import { Resolvable } from './helpers/types';
 import { timeout } from './functions/timeout';
-import { lastly } from './functions/lastly';
-import * as errors from './errors';
+import { notEnumerableProp } from './helpers/notEnumerableProp';
+import { Resolvable } from './helpers/types';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -255,3 +256,7 @@ Navybird.prototype.finally = function () {
 } as any
 
 Navybird.prototype.caught = Navybird.prototype.catch;
+
+Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {
+  notEnumerableProp(Navybird, key, Navybird[key]);
+});
