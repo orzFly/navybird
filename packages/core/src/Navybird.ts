@@ -10,10 +10,11 @@ import { join } from './functions/join';
 import { lastly } from './functions/lastly';
 import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
+import { nodeify, SpreadOption } from './functions/nodeify';
 import { reduce } from './functions/reduce';
 import { timeout } from './functions/timeout';
 import { notEnumerableProp } from './helpers/notEnumerableProp';
-import { Resolvable } from './helpers/types';
+import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
@@ -130,7 +131,17 @@ export class Navybird<T> extends Promise<T> {
    */
   timeout!: { <T>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback?: string | Error): Navybird<T>; <T, R>(this: PromiseLike<T> | (PromiseLike<T> & { cancel(): any; }), ms: number, fallback: () => Resolvable<R>): Navybird<R>; }
 
-  // FIXME: nodeify, asCallback
+  /**
+   * @$TypeExpand typeof nodeify
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  nodeify!: { <P extends PromiseLike<any>>(this: P, callback: (err: any, value?: PromiseLikeValueType<P>) => void, options?: SpreadOption): P; <P extends PromiseLike<any>>(this: P, ...sink: any[]): P; }
+
+  /**
+   * @$TypeExpand typeof nodeify
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  asCallback!: { <P extends PromiseLike<any>>(this: P, callback: (err: any, value?: PromiseLikeValueType<P>) => void, options?: SpreadOption): P; <P extends PromiseLike<any>>(this: P, ...sink: any[]): P; }
 
   // FIXME: reflect
 
@@ -362,6 +373,14 @@ Navybird.prototype.lastly = function () {
 
 Navybird.prototype.finally = function () {
   return lastly.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.nodeify = function () {
+  return nodeify.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.asCallback = function () {
+  return nodeify.call(this.constructor, this, ...arguments);
 } as any
 
 Navybird.prototype.caught = Navybird.prototype.catch;
