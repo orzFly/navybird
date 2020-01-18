@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    paths:
+    - .github/workflows/e2e-sequelize-workflow.yml
+
+name: 'E2E Sequelize'
+jobs:
+  chore:
+    name: 'Validating Sequelize'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: 'Use Node.js 12.x'
+      uses: actions/setup-node@master
+      with:
+        version: 12.x
+
+    - name: 'Build navybird'
+      run: |
+        yarn install --frozen-lockfile && yarn build
+
+    - name: 'Running the integration test'
+      run: |
+        set -ex
+        rm -Rf node_modules
+        git clone https://github.com/sequelize/sequelize.git sequelize
+        cd sequelize
+        git checkout v5.21.3
+        npm install
+        rm -Rf node_modules/bluebird node_modules/@types/bluebird
+        ln -s ../../packages/navybird node_modules/bluebird
+        ln -s ../../packages/navybird node_modules/navybird
+        find . -type d,l -name navybird
+        node -e "console.log(require('navybird'))"
+        find . -type d,l -name bluebird
+        node -e "console.log(require('bluebird'))"
+        DIALECT=sqlite npm test

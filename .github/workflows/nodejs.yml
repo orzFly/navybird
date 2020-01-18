@@ -1,6 +1,14 @@
 name: Build and Test
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    paths:
+    - packages
+    - package.json
+    - yarn.lock
 
 jobs:
   build:
