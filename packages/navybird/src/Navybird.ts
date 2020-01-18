@@ -380,12 +380,21 @@ export class Navybird<T> extends Promise<T> {
 
   // #endregion
 
+
+  // #region Dummy Methods
+
+  static config() { }
+  static hasLongStackTraces() { return false }
+  static longStackTraces() { }
+
+  static onPossiblyUnhandledRejection(...arg: any[]) { }
+
+  // #endregion
+
   static cast: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
   static fulfilled: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
   static rejected: typeof Navybird['reject'] = Navybird.reject.bind(Navybird)
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
-
-  static hasLongStackTraces() { return false }
 
   static getNewLibraryCopy = getNewLibraryCopy
 
