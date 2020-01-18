@@ -9,6 +9,7 @@ import { delay } from './functions/delay';
 import { eachSeries } from './functions/eachSeries';
 import { fromCallback, FromCallbackOptions } from './functions/fromCallback';
 import { immediate } from './functions/immediate';
+import { inspectable, reflect, Inspection, Inspectable } from './functions/inspectable';
 import { isPromise } from './functions/isPromise';
 import { isPromiseLike } from './functions/isPromiseLike';
 import { join } from './functions/join';
@@ -164,7 +165,17 @@ export class Navybird<T> extends Promise<T> {
    */
   asCallback!: { <P extends PromiseLike<any>>(this: P, callback: (err: any, value?: PromiseLikeValueType<P>) => void, options?: SpreadOption): P; <P extends PromiseLike<any>>(this: P, ...sink: any[]): P; }
 
-  // FIXME: reflect
+  /**
+   * @$TypeExpand typeof reflect
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  reflect!: <P extends PromiseLike<any>>(this: P) => Navybird<Inspection<P>>
+
+  /**
+   * @$TypeExpand typeof inspectable
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  inspectable!: <P extends PromiseLike<any>>(this: P) => P & Inspectable<P>
 
   return(): Navybird<void>;
   return<U>(value: U): Navybird<U>;
@@ -372,14 +383,14 @@ export class Navybird<T> extends Promise<T> {
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
 }
 
-export class NavybirdDefer<T> extends Defer<T> {
-  public readonly promise!: Navybird<T>
+export interface NavybirdDefer<T> extends Defer<T> {
+  readonly promise: Navybird<T>
 }
 
 const _Navybird = Navybird
 type _Navybird<T> = Navybird<T>
 
-const _NavybirdDefer = NavybirdDefer
+const _NavybirdDefer = Defer
 type _NavybirdDefer<T> = NavybirdDefer<T>
 
 export namespace Navybird {
@@ -397,6 +408,9 @@ export namespace Navybird {
 
   export const TimeoutError = errors.TimeoutError;
   export type TimeoutError = typeof TimeoutError;
+
+  export const PromiseInspection = Inspection;
+  export type PromiseInspection<P extends PromiseLike<any>> = Inspection<P>;
 }
 
 Navybird.prototype.timeout = function () {
@@ -435,6 +449,14 @@ Navybird.prototype.catchThrow = function () {
 
 Navybird.prototype.tapCatch = function () {
   return tapCatch.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.reflect = function () {
+  return reflect.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.inspectable = function () {
+  return inspectable.call(this.constructor, this, ...arguments);
 } as any
 
 Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {
