@@ -1264,12 +1264,6 @@ ci-info@^1.5.0:
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.6.0.tgz#2ca20dbb9ceb32d4524a683303313f0304b1e497"
   integrity sha512-vsGdkwSCDpWmP80ncATX7iea5DWQemg1UgCW5J8tqjU3lYw4FBYuj89J0CTVomA7BEfvSZd84GmHko+MxFQU2A==
 
-clarify@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/clarify/-/clarify-2.1.0.tgz#8dd48539e202e4e009d2c7fa7fe1b69cdf262527"
-  dependencies:
-    stack-chain "^2.0.0"
-
 class-utils@^0.3.5:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/class-utils/-/class-utils-0.3.6.tgz#f93369ae8b9a7ce02fd41faad0ca83033190c463"
@@ -4716,10 +4710,6 @@ ssri@^6.0.0, ssri@^6.0.1:
   dependencies:
     figgy-pudding "^3.5.1"
 
-stack-chain@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/stack-chain/-/stack-chain-2.0.0.tgz#d73d1172af89565f07438b5bcc086831b6689b2d"
-
 static-extend@^0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/static-extend/-/static-extend-0.1.2.tgz#60809c39cbff55337226fd5e0b520f341f1fb5c6"
@@ -4984,13 +4974,6 @@ tr46@^1.0.1:
   integrity sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=
   dependencies:
     punycode "^2.1.0"
-
-trace@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/trace/-/trace-3.1.1.tgz#061eebf012805611cb02138440bc716979b0eb11"
-  integrity sha512-iVxFnDKps8bCRQ6kXj66rHYFJY3fNkoYPHeFTFZn89YdwmmQ9Hz97IFPf3NdfbCF3zuqUqFpRNTu6N9+eZR2qg==
-  dependencies:
-    stack-chain "^2.0.0"
 
 trim-newlines@^1.0.0:
   version "1.0.0"
