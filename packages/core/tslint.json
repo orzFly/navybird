@@ -1,8 +1,6 @@
 {
   "extends": "tslint:recommended",
-  "rulesDirectory": "src/peptide/.tslint/rules",
   "rules": {
-    "peptide-use-model-instance": true,
     "no-reference": false,
     "max-line-length": false,
     "no-arg": false,
