@@ -1,6 +1,6 @@
 "use strict";
 
-var Promise = require("../..");
+var Promise = require("navybird");
 var assert = require("assert");
 var testUtils = require("./helpers/util.js");
 var awaitGlobalException = testUtils.awaitGlobalException;

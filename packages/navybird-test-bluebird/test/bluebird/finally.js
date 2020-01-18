@@ -1,6 +1,6 @@
 "use strict";
 var assert = require("assert");
-var Promise = require("../..");
+var Promise = require("navybird");
 /*!
  *
 Copyright 2009–2012 Kristopher Michael Kowal. All rights reserved.

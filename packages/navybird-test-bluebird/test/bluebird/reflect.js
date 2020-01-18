@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require("assert");
-var Promise = require("../..");
+var Promise = require("navybird");
 var testFulfilled = require("./helpers/testThreeCases").testFulfilled;
 var testRejected = require("./helpers/testThreeCases").testRejected;
 

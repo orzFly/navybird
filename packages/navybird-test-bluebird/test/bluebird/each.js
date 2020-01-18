@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require("assert");
-var Promise = require("../..");
+var Promise = require("navybird");
 
 function promised(val) {
   return new Promise(function(f) {

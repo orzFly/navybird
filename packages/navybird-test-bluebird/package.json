@@ -1,0 +1,17 @@
+{
+  "name": "@navybird/test-bluebird",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "author": "Yeechan Lu",
+  "dependencies": {
+    "navybird": "*"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.2",
+    "sinon": "^7.3.1"
+  },
+  "scripts": {
+    "test": "nyc --cwd=../../ mocha"
+  }
+}

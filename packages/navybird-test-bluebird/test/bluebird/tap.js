@@ -1,6 +1,6 @@
 "use strict";
 var assert = require("assert");
-var Promise = require("../..");
+var Promise = require("navybird");
 
 describe("tap", function() {
   specify("passes through value", function() {

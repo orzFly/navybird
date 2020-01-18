@@ -11,8 +11,8 @@
     "lint:json": "lerna run --stream --concurrency 1 lint:tslint:json",
     "test": "lerna run --stream --concurrency 1 --sort test",
     "coverage": "run-s coverage:gather coverage:report",
-    "coverage:gather": "lerna run --stream --concurrency 1 --sort coverage",
-    "coverage:report": "genhtml -o coverage packages/**/coverage/*.lcov.txt"
+    "coverage:gather": "mkdir -p coverage && nyc report --reporter=text-lcov > coverage/root.lcov.txt",
+    "coverage:report": "genhtml -o coverage coverage/*.lcov.txt"
   },
   "workspaces": [
     "packages/*"
@@ -22,6 +22,9 @@
     "produce-source-map": true,
     "require": [
       "source-map-support/register"
+    ],
+    "include": [
+      "packages/navybird/**"
     ]
   },
   "devDependencies": {

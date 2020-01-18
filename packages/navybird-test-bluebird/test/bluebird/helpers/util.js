@@ -1,5 +1,5 @@
 var assert = require("assert");
-var Promise = require("../../..");
+var Promise = require("navybird");
 var token = {};
 
 module.exports = {

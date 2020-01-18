@@ -1,6 +1,6 @@
 "use strict";
 var assert = require("assert");
-var Promise = require("../..");
+var Promise = require("navybird");
 function rejection() {
   var error = new Error("test");
   var rejection = Promise.reject(error);

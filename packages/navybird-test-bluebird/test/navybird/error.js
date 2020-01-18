@@ -1,6 +1,6 @@
 "use strict";
 const assert = require("assert");
-const Promise = require("../..");
+const Promise = require("navybird");
 
 describe("Promise.prototype.error", function() {
   describe("catches stuff originating from explicit rejections", function() {

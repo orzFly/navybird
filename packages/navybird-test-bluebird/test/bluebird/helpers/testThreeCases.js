@@ -1,6 +1,6 @@
 "use strict";
 
-var adapter = require("../../..");
+var adapter = require("navybird");
 var fulfilled = adapter.fulfilled;
 var rejected = adapter.rejected;
 var pending = adapter.pending;

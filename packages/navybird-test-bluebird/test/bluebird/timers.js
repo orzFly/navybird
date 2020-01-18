@@ -1,7 +1,7 @@
 "use strict";
 var assert = require("assert");
 var testUtils = require("./helpers/util.js");
-var Promise = require("../..");
+var Promise = require("navybird");
 var Q = Promise;
 // NAVYBIRD DIFF
 // Promise.config({cancellation: true})
