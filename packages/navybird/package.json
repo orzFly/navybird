@@ -1,6 +1,6 @@
 {
-  "name": "@navybird/core",
-  "version": "0.0.1",
+  "name": "navybird",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "license": "MIT",
   "private": true,
@@ -28,7 +28,7 @@
     "test": "nyc mocha",
     "coverage": "mkdir -p coverage && nyc report --reporter=text-lcov > coverage/main.lcov.txt",
     "build": "run-s build:codegen build:typescript",
-    "build:codegen": "node ../build/dist",
+    "build:codegen": "node ../navybird-build/dist",
     "build:typescript": "tsc",
     "watch": "tsc -w",
     "cleanbuild": "run-s clean build",
