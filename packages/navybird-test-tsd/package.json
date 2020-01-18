@@ -1,0 +1,16 @@
+{
+  "name": "@navybird/test-tsd",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "author": "Yeechan Lu",
+  "dependencies": {
+    "navybird": "*"
+  },
+  "devDependencies": {
+    "tsd": "^0.11.0"
+  },
+  "scripts": {
+    "test": "tsd"
+  }
+}

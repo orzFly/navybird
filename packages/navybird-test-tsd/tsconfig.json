@@ -19,22 +19,6 @@
       "es6"
     ],
     "jsx": "react",
-    "importHelpers": true,
-    "plugins": [
-      {
-        "name": "typescript-tslint-plugin",
-        "alwaysShowRuleFailuresAsWarnings": false,
-        "ignoreDefinitionFiles": true,
-        "suppressWhileTypeErrorsPresent": false
-      }
-    ]
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.js",
-  ],
-  "exclude": [
-    "src/**/*.test-d.ts",
-    "node_modules"
-  ]
+    "importHelpers": true
+  }
 }
