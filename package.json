@@ -28,7 +28,6 @@
     ]
   },
   "devDependencies": {
-    "coveralls": "^3.0.3",
     "lerna": "^3.13.2",
     "npm-run-all": "^4.1.2",
     "nyc": "^13.3.0",
