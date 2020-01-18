@@ -1,4 +1,6 @@
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { notEnumerableProp } from '../helpers/notEnumerableProp';
+import { wrapAsOperationalError, maybeWrapAsError } from '../errors/OperationalError';
 
 export interface BasePromisifyOptions {
   context?: any;
@@ -23,6 +25,8 @@ export interface PromisifyOptions extends BasePromisifyOptions {
   multiArgs?: boolean | null | undefined;
   errorFirst?: boolean | null | undefined;
 }
+
+const PROMISIFIED_KEY = '__isPromisified__';
 
 /**
  * Returns a function that will wrap the given `nodeFunction`.
@@ -140,32 +144,32 @@ export function promisify(
   func: (...args: any[]) => void,
   options: PromisifyOptions = {}
 ): (...args: any[]) => GenericPromise<any> {
-  const Promise = getPromiseConstructor(this);
-  const { context, multiArgs, errorFirst } = Object.assign({
-    context: undefined,
-    multiArgs: false,
-    errorFirst: true,
-  }, options)
+  if ((func as any)[PROMISIFIED_KEY]) return func as any;
 
-  return function (...args: any[]) {
+  const Promise = getPromiseConstructor(this);
+  const context = options.context
+  const multiArgs = options.multiArgs === true ? true : false;
+  const errorFirst = multiArgs ? options.errorFirst === true : options.errorFirst !== false
+
+  const result = function promisifiedFunction(...args: any[]) {
     return new Promise((resolve, reject) => {
       if (multiArgs === true) {
         args.push((...result: any[]) => {
-          if (errorFirst === false) {
+          if (errorFirst !== true) {
             if (result[0]) {
-              reject(result);
+              reject(wrapAsOperationalError(maybeWrapAsError(result[0])));
             } else {
               result.shift();
-              resolve(result);
+              resolve(Promise.all(result));
             }
           } else {
-            resolve(result);
+            resolve(Promise.all(result));
           }
         });
       } else if (errorFirst !== false) {
         args.push((error: any, result: any) => {
           if (error) {
-            reject(error);
+            reject(wrapAsOperationalError(maybeWrapAsError(error)));
           } else {
             resolve(result);
           }
@@ -177,4 +181,7 @@ export function promisify(
       func.apply(context === undefined ? this : context, args);
     });
   };
+  notEnumerableProp(result, PROMISIFIED_KEY, true);
+
+  return result;
 }

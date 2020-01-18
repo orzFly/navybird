@@ -63,3 +63,23 @@ export function originatesFromRejection(e?: any) {
 
   return false;
 };
+
+function isPrimitive(val: any) {
+  return val == null || val === true || val === false ||
+    typeof val === "string" || typeof val === "number";
+
+}
+
+function safeToString(obj: any) {
+  try {
+    return obj + "";
+  } catch (e) {
+    return "[no string representation]";
+  }
+}
+
+export function maybeWrapAsError(maybeError: any): Error {
+  if (!isPrimitive(maybeError)) return maybeError;
+
+  return new Error(safeToString(maybeError));
+}

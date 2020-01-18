@@ -386,6 +386,8 @@ export class Navybird<T> extends Promise<T> {
   static fulfilled: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
   static rejected: typeof Navybird['reject'] = Navybird.reject.bind(Navybird)
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
+
+  static hasLongStackTraces() { return false }
 }
 
 export interface NavybirdDefer<T> extends Defer<T> {
