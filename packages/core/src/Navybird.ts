@@ -1,4 +1,7 @@
 import * as errors from './errors';
+import { catchReturn } from './functions/catchReturn';
+import { catchThrow } from './functions/catchThrow';
+import { CatchFilter, caught } from './functions/caught';
 import { Defer, defer } from './functions/defer';
 import { delay } from './functions/delay';
 import { eachSeries } from './functions/eachSeries';
@@ -17,6 +20,9 @@ import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
 export class Navybird<T> extends Promise<T> {
+  static default = Navybird
+  static Navybird = Navybird
+
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
 
@@ -88,7 +94,11 @@ export class Navybird<T> extends Promise<T> {
 
   // #region Instance Methods
 
-  // FIXME: .catch
+  /**
+   * @$TypeExpand typeof caught
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  catch!: { <P extends PromiseLike<any>>(this: P, onReject: (error: any) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, onReject: (error: any) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, E1, E2, E3, E4, E5>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, filter5: CatchFilter<E5>, onReject: (error: E1 | E2 | E3 | E4 | E5) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3, E4, E5>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, filter5: CatchFilter<E5>, onReject: (error: E1 | E2 | E3 | E4 | E5) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, E1, E2, E3, E4>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, onReject: (error: E1 | E2 | E3 | E4) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3, E4>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, onReject: (error: E1 | E2 | E3 | E4) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, E1, E2, E3>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, onReject: (error: E1 | E2 | E3) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, onReject: (error: E1 | E2 | E3) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, E1, E2>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, onReject: (error: E1 | E2) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, onReject: (error: E1 | E2) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, E1>(this: P, filter1: CatchFilter<E1>, onReject: (error: E1) => PromiseLikeValueType<P> | PromiseLike<PromiseLikeValueType<P>>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1>(this: P, filter1: CatchFilter<E1>, onReject: (error: E1) => U | PromiseLike<U>): Navybird<U | PromiseLikeValueType<P>>; }
 
   caught!: Navybird<T>['catch']
 
@@ -173,7 +183,17 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
-  // FIXME: catchReturn, catchThrow
+  /**
+   * @$TypeExpand typeof catchReturn
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  catchReturn!: { <P extends PromiseLike<any>, U>(this: P, value: U): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, filter4: CatchFilter<Error>, filter5: CatchFilter<Error>, value: U): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, filter4: CatchFilter<Error>, value: U): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, value: U): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, value: U): Navybird<U | PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U>(this: P, filter1: CatchFilter<Error>, value: U): Navybird<U | PromiseLikeValueType<P>>; }
+
+  /**
+   * @$TypeExpand typeof catchThrow
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  catchThrow!: { <P extends PromiseLike<any>>(this: P, reason: Error): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, filter4: CatchFilter<Error>, filter5: CatchFilter<Error>, reason: Error): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, filter4: CatchFilter<Error>, reason: Error): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, filter3: CatchFilter<Error>, reason: Error): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>>(this: P, filter1: CatchFilter<Error>, filter2: CatchFilter<Error>, reason: Error): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>>(this: P, filter1: CatchFilter<Error>, reason: Error): Navybird<PromiseLikeValueType<P>>; }
 
   /**
    * Like calling `.then`, but the fulfillment value or rejection reason is assumed to be an array, which is flattened to the formal parameters of the handlers.
@@ -183,7 +203,7 @@ export class Navybird<T> extends Promise<T> {
       throw new errors.TypeError(
         `fulfilledHandler is not function`
       );
-    // TODO:
+      // TODO:
       // return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
     }
     return this.then(function spreadOnFulfilled(val) {
@@ -334,15 +354,6 @@ export class Navybird<T> extends Promise<T> {
     <TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Navybird<TResult1 | TResult2>
   };
 
-  /**
-   * Attaches a callback for only the rejection of the Promise.
-   * @param onrejected The callback to execute when the Promise is rejected.
-   * @returns A Promise for the completion of the callback.
-   */
-  catch!: {
-    <TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Navybird<T | TResult>
-  };
-
   // #endregion
 
   static cast: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
@@ -383,7 +394,19 @@ Navybird.prototype.asCallback = function () {
   return nodeify.call(this.constructor, this, ...arguments);
 } as any
 
+Navybird.prototype.catch = function () {
+  return caught.call(this.constructor, this, ...arguments);
+} as any
+
 Navybird.prototype.caught = Navybird.prototype.catch;
+
+Navybird.prototype.catchReturn = function () {
+  return catchReturn.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.catchThrow = function () {
+  return catchThrow.call(this.constructor, this, ...arguments);
+} as any
 
 Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {
   notEnumerableProp(Navybird, key, Navybird[key]);
