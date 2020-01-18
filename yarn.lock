@@ -2625,11 +2625,6 @@ is-directory@^0.3.1:
   resolved "https://registry.yarnpkg.com/is-directory/-/is-directory-0.3.1.tgz#61339b6f2475fc772fd9c9d83f5c8575dc154ae1"
   integrity sha1-YTObbyR1/Hcv2cnYP1yFddwVSuE=
 
-is-error-constructor@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/is-error-constructor/-/is-error-constructor-2.1.0.tgz#1b1f6909e66fef1bf3e24f130bc549abfd1b67fd"
-  integrity sha512-UICSSkd/VnAC1BbLKoND+J2zm/3VmvumO3ReUWJmXfTACphJm2ccseHp24B3y0gYCWahsxFVYqbPzlc3Cct8Zg==
-
 is-extendable@^0.1.0, is-extendable@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/is-extendable/-/is-extendable-0.1.1.tgz#62b110e289a471418e3ec36a617d472e301dfc89"
@@ -3805,13 +3800,6 @@ osenv@0, osenv@^0.1.5:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
-p-catch-if@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/p-catch-if/-/p-catch-if-2.1.0.tgz#bb48d2a548926b7afbad2ce854b50466b8db339d"
-  integrity sha512-bWSHVRaqgPWjOehn62b7luSoRktu9xmvSl+ojKHG38FNyVkEHZvFFrkOEX7WvrerreSSopkjnC3sXuXIz0em1Q==
-  dependencies:
-    is-error-constructor "^2.0.0"
-
 p-defer@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-defer/-/p-defer-1.0.0.tgz#9f6eb182f6c9aa8cd743004a7d4f96b196b0fb0c"
@@ -3821,7 +3809,7 @@ p-finally@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-1.0.0.tgz#3fbcfb15b899a44123b34b6dcc18b724336a2cae"
 
-p-is-promise@^2.0.0, p-is-promise@^2.1.0:
+p-is-promise@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/p-is-promise/-/p-is-promise-2.1.0.tgz#918cebaea248a62cf7ffab8e3bca8c5f882fc42e"
   integrity sha512-Y3W0wlRPK8ZMRbNq97l4M5otioeA5lm1z7bkNkxCka8HSPjR0xRWmpCmc9utiaLP9Jb1eD8BgeIxTW4AIF45Pg==

@@ -34,9 +34,5 @@
     "cleanbuild": "run-s clean build",
     "cleanwatch": "run-s clean watch",
     "clean": "rimraf dist .nyc_output coverage"
-  },
-  "dependencies": {
-    "p-catch-if": "^2.1.0",
-    "p-is-promise": "^2.1.0"
   }
 }
