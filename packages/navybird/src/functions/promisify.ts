@@ -1,6 +1,6 @@
-import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { maybeWrapAsError, wrapAsOperationalError } from '../errors/OperationalError';
+import { GenericPromise, getPromiseConstructor, PromiseConstructorLikeThis } from '../helpers/getPromiseConstructor';
 import { notEnumerableProp } from '../helpers/notEnumerableProp';
-import { wrapAsOperationalError, maybeWrapAsError } from '../errors/OperationalError';
 
 export interface BasePromisifyOptions {
   context?: any;
@@ -141,6 +141,7 @@ export function promisify<T, A1, A2, A3, A4, A5>(
 ): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => GenericPromise<T>;
 
 export function promisify(
+  this: PromiseConstructorLikeThis,
   func: (...args: any[]) => void,
   options: PromisifyOptions = {}
 ): (...args: any[]) => GenericPromise<any> {
@@ -151,7 +152,7 @@ export function promisify(
   const multiArgs = options.multiArgs === true ? true : false;
   const errorFirst = multiArgs ? options.errorFirst === true : options.errorFirst !== false
 
-  const result = function promisifiedFunction(...args: any[]) {
+  const result = function promisifiedFunction(this: any, ...args: any[]) {
     return new Promise((resolve, reject) => {
       if (multiArgs === true) {
         args.push((...result: any[]) => {
@@ -182,6 +183,26 @@ export function promisify(
     });
   };
   notEnumerableProp(result, PROMISIFIED_KEY, true);
+
+  try {
+    if (func.name) {
+      Object.defineProperty(result, 'name', {
+        value: func.name + 'Async',
+        writable: false,
+        enumerable: false,
+        configurable: true
+      })
+    }
+  } catch (e) { }
+
+  try {
+    Object.defineProperty(result, 'length', {
+      value: func.length > 1 ? (func.length - 1) : 0,
+      writable: false,
+      enumerable: false,
+      configurable: true
+    })
+  } catch (e) { }
 
   return result;
 }

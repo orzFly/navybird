@@ -1062,12 +1062,14 @@ if (canTestArity) {
       var fn = function (a, b, c, callback) { };
       assert.equal(Promise.promisify(fn).length, 3);
 
-      var o = {
-        fn: function (a, b, c, callback) {
+      if (Promise.promisifyAll) {
+        var o = {
+          fn: function (a, b, c, callback) {
 
-        }
-      };
-      assert.equal(Promise.promisifyAll(o).fnAsync.length, 3);
+          }
+        };
+        assert.equal(Promise.promisifyAll(o).fnAsync.length, 3);
+      }
     })
   })
 }
