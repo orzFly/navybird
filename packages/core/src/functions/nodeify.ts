@@ -36,6 +36,8 @@ export function nodeify<P extends PromiseLike<any>>(
     }
     : function nodeifyNormalAdapter(res: PromiseLikeValueType<P>) {
       nextTick(function nodeifyNormalAdapterNextTick() {
+        if (res === undefined)
+          return callback(null);
         return callback(null, res);
       });
     };
