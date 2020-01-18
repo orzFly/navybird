@@ -25,8 +25,6 @@ import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
 export class Navybird<T> extends Promise<T> {
-  static default = Navybird
-
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
 
@@ -388,36 +386,25 @@ export class Navybird<T> extends Promise<T> {
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
 
   static hasLongStackTraces() { return false }
+
+  static getNewLibraryCopy = getNewLibraryCopy
+
+  static default = Navybird
+  static Navybird = Navybird
+  static Bluebird = Navybird
+  static Promise = Navybird
+
+  static Defer = Defer
+  static NavybirdDefer = Defer
+  static PromiseInspection = Inspection
+
+  static TypeError = errors.TypeError
+  static OperationalError = errors.OperationalError
+  static TimeoutError = errors.TimeoutError
 }
 
 export interface NavybirdDefer<T> extends Defer<T> {
   readonly promise: Navybird<T>
-}
-
-const _Navybird = Navybird
-type _Navybird<T> = Navybird<T>
-
-const _NavybirdDefer = Defer
-type _NavybirdDefer<T> = NavybirdDefer<T>
-
-export namespace Navybird {
-  export const Navybird = _Navybird;
-  export type Navybird<T> = _Navybird<T>;
-
-  export const NavybirdDefer = _NavybirdDefer;
-  export type NavybirdDefer<T> = _NavybirdDefer<T>;
-
-  export const TypeError = errors.TypeError;
-  export type TypeError = typeof TypeError;
-
-  export const OperationalError = errors.OperationalError;
-  export type OperationalError = typeof OperationalError;
-
-  export const TimeoutError = errors.TimeoutError;
-  export type TimeoutError = typeof TimeoutError;
-
-  export const PromiseInspection = Inspection;
-  export type PromiseInspection<P extends PromiseLike<any>> = Inspection<P>;
 }
 
 Navybird.prototype.timeout = function () {
@@ -469,3 +456,27 @@ Navybird.prototype.inspectable = function () {
 Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {
   notEnumerableProp(Navybird, key, Navybird[key]);
 });
+
+export function getNewLibraryCopy(): typeof Navybird {
+  const Newbird: typeof Navybird = class Navybird<T> extends Promise<T> { } as any
+
+  const rootProperties = Object.getOwnPropertyDescriptors(Navybird)
+  delete rootProperties.prototype;
+  Object.defineProperties(Newbird, rootProperties);
+
+  const prototypeProperties = Object.getOwnPropertyDescriptors(Navybird.prototype)
+  delete prototypeProperties.constructor;
+  Object.defineProperties(Newbird.prototype, prototypeProperties);
+
+  Newbird.default = Newbird
+  Newbird.Navybird = Newbird
+  Newbird.Bluebird = Newbird
+  Newbird.Promise = Newbird
+
+  Newbird.cast = Newbird.resolve.bind(Newbird)
+  Newbird.fulfilled = Newbird.resolve.bind(Newbird)
+  Newbird.rejected = Newbird.reject.bind(Newbird)
+  Newbird.pending = Newbird.defer.bind(Newbird)
+
+  return Newbird
+}
