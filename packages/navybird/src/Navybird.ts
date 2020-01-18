@@ -24,7 +24,6 @@ import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
 export class Navybird<T> extends Promise<T> {
   static default = Navybird
-  static Navybird = Navybird
 
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
@@ -373,7 +372,23 @@ export class Navybird<T> extends Promise<T> {
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
 }
 
+export class NavybirdDefer<T> extends Defer<T> {
+  public readonly promise!: Navybird<T>
+}
+
+const _Navybird = Navybird
+type _Navybird<T> = Navybird<T>
+
+const _NavybirdDefer = NavybirdDefer
+type _NavybirdDefer<T> = NavybirdDefer<T>
+
 export namespace Navybird {
+  export const Navybird = _Navybird;
+  export type Navybird<T> = _Navybird<T>;
+
+  export const NavybirdDefer = _NavybirdDefer;
+  export type NavybirdDefer<T> = _NavybirdDefer<T>;
+
   export const TypeError = errors.TypeError;
   export type TypeError = typeof TypeError;
 
@@ -382,10 +397,6 @@ export namespace Navybird {
 
   export const TimeoutError = errors.TimeoutError;
   export type TimeoutError = typeof TimeoutError;
-}
-
-export class NavybirdDefer<T> extends Defer<T> {
-  public readonly promise!: Navybird<T>
 }
 
 Navybird.prototype.timeout = function () {
