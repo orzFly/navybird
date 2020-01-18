@@ -223,9 +223,7 @@ export class Navybird<T> extends Promise<T> {
   spread<U, Q>(this: Navybird<T & Iterable<Q>>, fulfilledHandler: (...values: Q[]) => Resolvable<U>): Navybird<U> {
     return this.then(function spreadOnFulfilled(val) {
       if (typeof fulfilledHandler !== "function") {
-        throw new errors.TypeError(
-          `fulfilledHandler is not function`
-        );
+        throw new errors.TypeError(`fulfilledHandler is not function`);
         // TODO: return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
       }
       return fulfilledHandler(...val);

@@ -36,9 +36,7 @@ export function map<R, U>(
     }, opts);
 
     if (typeof mapper !== "function") {
-      throw new TypeError(
-        `Mapper is not function`
-      );
+      throw new TypeError(`Mapper is not function`);
       // TODO: return resolve(utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn)));
     }
 
