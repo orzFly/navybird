@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "main": "dist/index.js",
   "license": "MIT",
-  "private": true,
+  "description": "A polyfill of (mostly) Bluebird utilties for native Promise",
   "author": "Yeechan Lu",
   "devDependencies": {
     "@navybird/build": "*",
