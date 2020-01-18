@@ -1,3 +1,4 @@
+import { wrapAsOperationalError } from '../errors/OperationalError';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
 
 export interface FromCallbackOptions {
@@ -42,8 +43,3 @@ export function fromCallback(
 
 export type FromNodeOptions = FromCallbackOptions
 export const fromNode = fromCallback
-
-function wrapAsOperationalError(err: any) {
-  // FIXME:
-  return err;
-}

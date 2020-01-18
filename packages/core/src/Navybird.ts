@@ -1,4 +1,6 @@
 import * as errors from './errors';
+import { originatesFromRejection } from './errors/OperationalError';
+import { catchIf } from './functions/catchIf';
 import { catchReturn } from './functions/catchReturn';
 import { catchThrow } from './functions/catchThrow';
 import { CatchFilter, caught } from './functions/caught';
@@ -15,6 +17,7 @@ import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { nodeify, SpreadOption } from './functions/nodeify';
 import { reduce } from './functions/reduce';
+import { tapCatch } from './functions/tapCatch';
 import { timeout } from './functions/timeout';
 import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
@@ -102,7 +105,12 @@ export class Navybird<T> extends Promise<T> {
 
   caught!: Navybird<T>['catch']
 
-  // FIXME: .error
+  /**
+   * Like `.catch` but instead of catching all types of exceptions, it only catches those that don't originate from thrown errors but rather from explicit rejections.
+   */
+  error<U>(onReject: (reason: any) => U | PromiseLike<U>) {
+    return this.then(null, catchIf(originatesFromRejection, onReject))
+  }
 
   finally!: Navybird<T>['lastly']
 
@@ -123,7 +131,11 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
-  // FIXME: .tapCatch
+  /**
+   * @$TypeExpand typeof tapCatch
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/promise:/g, "this:")
+   */
+  tapCatch!: { <P extends PromiseLike<any>, U>(this: P, onReject: (error?: any) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3, E4, E5>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, filter5: CatchFilter<E5>, onReject: (error: E1 | E2 | E3 | E4 | E5) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3, E4>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, filter4: CatchFilter<E4>, onReject: (error: E1 | E2 | E3 | E4) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2, E3>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, filter3: CatchFilter<E3>, onReject: (error: E1 | E2 | E3) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1, E2>(this: P, filter1: CatchFilter<E1>, filter2: CatchFilter<E2>, onReject: (error: E1 | E2) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; <P extends PromiseLike<any>, U, E1>(this: P, filter1: CatchFilter<E1>, onReject: (error: E1) => U | PromiseLike<U>): Navybird<PromiseLikeValueType<P>>; }
 
   delay(ms: number) {
     return this.tap(function delayValue() {
@@ -365,6 +377,9 @@ export namespace Navybird {
   export const TypeError = errors.TypeError;
   export type TypeError = typeof TypeError;
 
+  export const OperationalError = errors.OperationalError;
+  export type OperationalError = typeof OperationalError;
+
   export const TimeoutError = errors.TimeoutError;
   export type TimeoutError = typeof TimeoutError;
 }
@@ -405,6 +420,10 @@ Navybird.prototype.catchReturn = function () {
 
 Navybird.prototype.catchThrow = function () {
   return catchThrow.call(this.constructor, this, ...arguments);
+} as any
+
+Navybird.prototype.tapCatch = function () {
+  return tapCatch.call(this.constructor, this, ...arguments);
 } as any
 
 Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, string>) {

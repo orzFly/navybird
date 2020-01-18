@@ -5,7 +5,7 @@ interface ErrorConstructor {
   new(message?: string): Error;
 }
 
-type Predicate =
+export type CatchIfPredicate =
   | ErrorConstructor
   | ReadonlyArray<ErrorConstructor>
   | boolean
@@ -49,9 +49,9 @@ function isErrorConstructor(constructor: unknown): constructor is ErrorConstruct
   return constructor === Error || (constructor && (<any>constructor).prototype instanceof Error);
 }
 
-export function catchIf<T>(predicate: Predicate, catchHandler: (error: Error) => T | Promise<T>): (
+export function catchIf<T>(predicate: CatchIfPredicate, catchHandler: (error: Error) => T | PromiseLike<T>): (
   error: Error
-) => T | Promise<T> {
+) => T | PromiseLike<T> {
   return function catchIfHandler (error) {
     if (typeof catchHandler !== 'function') {
       throw new TypeError('Expected a catch handler');
