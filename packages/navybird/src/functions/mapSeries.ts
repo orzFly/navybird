@@ -1,6 +1,7 @@
-import { Resolvable } from '../helpers/types';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { Resolvable } from '../helpers/types';
 import { reduce } from './reduce';
+import { tapSchedule } from './schedule';
 
 /**
  * Given an Iterable(arrays are Iterable), or a promise of an Iterable, which produces promises (or a mix of promises and values), iterate over all the values in the Iterable into an array and iterate over the array serially, in-order.
@@ -22,14 +23,14 @@ export function mapSeries<R, U>(
     reduce(
       iterable,
       function mapSeriesReducer(a, b, i, length) {
-        return Promise.resolve(iterator(b, i, length)).then(
+        return Promise.resolve(iterator(b, i, length)).then(tapSchedule).then(
           function mapSeriesMapperCallback(val) {
             ret.push(val);
           }
         );
       },
       {}
-    ).then(function mapSeriesResult() {
+    ).then(tapSchedule).then(function mapSeriesResult() {
       return ret
     })
   );

@@ -18,15 +18,18 @@ import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { nodeify, SpreadOption } from './functions/nodeify';
 import { MultiArgsNoErrorPromisifyOptions, MultiArgsPromisifyOptions, NoErrorPromisifyOptions, promisify, PromisifyOptions } from './functions/promisify';
+import { props, ResolvableProps } from './functions/props';
 import { reduce } from './functions/reduce';
 import { tapCatch } from './functions/tapCatch';
 import { timeout } from './functions/timeout';
 import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
+const promiseResolve = Promise.resolve
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
+  static bind: never = null as never
 
   /**
    * @$TypeExpand typeof defer
@@ -99,6 +102,37 @@ export class Navybird<T> extends Promise<T> {
    * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/this: PromiseConstructorLikeThis, /g, "")
    */
   static promisify: { <T extends any[]>(func: (callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): () => Navybird<T>; <T extends any[], A1>(func: (arg1: A1, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1) => Navybird<T>; <T extends any[], A1, A2>(func: (arg1: A1, arg2: A2, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T extends any[], A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T extends any[], A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T extends any[], A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T>(func: (callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): () => Navybird<T>; <T, A1>(func: (arg1: A1, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1) => Navybird<T>; <T, A1, A2>(func: (arg1: A1, arg2: A2, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T, A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T, A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T, A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T extends any[]>(func: (callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): () => Navybird<T>; <T extends any[], A1>(func: (arg1: A1, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1) => Navybird<T>; <T extends any[], A1, A2>(func: (arg1: A1, arg2: A2, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T extends any[], A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T extends any[], A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T extends any[], A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T>(func: (callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): () => Navybird<T>; <T, A1>(func: (arg1: A1, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1) => Navybird<T>; <T, A1, A2>(func: (arg1: A1, arg2: A2, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T, A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T, A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T, A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; } = promisify as any
+
+  static try<T>(fn: () => T | PromiseLike<T>): Navybird<T> { 
+    try {
+      return this.resolve(fn());
+    } catch (e) {
+      return this.reject(e);
+    }
+  }
+
+  static attempt = Navybird.try;
+
+  static method<T, Args extends any[]>(fn: (...args: Args) => T | PromiseLike<T>): (...args: Args) => Navybird<T> {
+    if (typeof fn !== "function") {
+      throw new errors.TypeError(`fn is not function`);
+      // TODO: return errors.TypeError(constants.FUNCTION_ERROR + utils.classString(fn));
+    }
+    const that = this;
+    return function () {
+      try {
+        return that.resolve(fn.apply(this, arguments));
+      } catch (e) {
+        return that.reject(e);
+      }
+    }
+  }
+
+  /**
+   * @$TypeExpand typeof props
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/this: PromiseConstructorLikeThis, /g, "")
+   */
+  static props: { <K, V>(promise: Resolvable<Map<K, Resolvable<V>>>): Navybird<Map<K, V>>; <T>(promise: Resolvable<ResolvableProps<T>>): Navybird<T>; } = props as any
 
   // #region Instance Methods
 
@@ -318,6 +352,32 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
+  get<U extends keyof T>(key: U): Navybird<T[U]> {
+    return this.then(function getPropertyHandler(obj: any) {
+      if (typeof key === 'number') {
+        let index = +key;
+        if (index < 0) index = Math.max(0, index + obj.length);
+        return obj[index];
+      } else {
+        return obj[key];
+      }
+    })
+  }
+
+  /**
+   * Same as calling `Promise.props(thisPromise)`.
+   */
+  props<K, V>(promise: Resolvable<Map<K, Resolvable<V>>>): Navybird<Map<K, V>>;
+  props<T>(promise: Resolvable<ResolvableProps<T>>): Navybird<T>;
+
+  props(): Navybird<any> {
+    const args = arguments
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function propsOnFulfilled(val: any) {
+      return promiseConstructor.props.call(promiseConstructor, val, ...args);
+    });
+  }
+
   // #endregion
 
   // #region Original Methods
@@ -366,7 +426,7 @@ export class Navybird<T> extends Promise<T> {
      * @returns A resolved promise.
      */
     (): Navybird<void>
-  };
+  } = promiseResolve as any
 
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -380,12 +440,22 @@ export class Navybird<T> extends Promise<T> {
 
   // #endregion
 
+
+  // #region Dummy Methods
+
+  static config(...arg: any[]) { }
+
+  static hasLongStackTraces() { return false }
+  static longStackTraces() { }
+
+  static onPossiblyUnhandledRejection(...arg: any[]) { }
+
+  // #endregion
+
   static cast: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
   static fulfilled: typeof Navybird['resolve'] = Navybird.resolve.bind(Navybird)
   static rejected: typeof Navybird['reject'] = Navybird.reject.bind(Navybird)
   static pending: typeof Navybird['defer'] = Navybird.defer.bind(Navybird)
-
-  static hasLongStackTraces() { return false }
 
   static getNewLibraryCopy = getNewLibraryCopy
 
@@ -401,6 +471,7 @@ export class Navybird<T> extends Promise<T> {
   static TypeError = errors.TypeError
   static OperationalError = errors.OperationalError
   static TimeoutError = errors.TimeoutError
+  static AggregateError = errors.AggregateError
 }
 
 export interface NavybirdDefer<T> extends Defer<T> {
@@ -473,10 +544,24 @@ export function getNewLibraryCopy(): typeof Navybird {
   Newbird.Bluebird = Newbird
   Newbird.Promise = Newbird
 
+  Newbird.resolve = function resolve(this: any, ...args: any[]) {
+    let promiseConstructor = Newbird;
+    if (this && typeof this === 'function' && this.resolve && this.prototype && this.prototype.then) {
+      promiseConstructor = this;
+    }
+
+    return promiseResolve.apply(promiseConstructor, args);
+  }
+  Newbird.resolve.prototype = Newbird;
+
   Newbird.cast = Newbird.resolve.bind(Newbird)
   Newbird.fulfilled = Newbird.resolve.bind(Newbird)
   Newbird.rejected = Newbird.reject.bind(Newbird)
   Newbird.pending = Newbird.defer.bind(Newbird)
+
+  // FIXME: try to find a better way
+  Newbird.try = Newbird.try.bind(Newbird)
+  Newbird.attempt = Newbird.attempt.bind(Newbird)
 
   return Newbird
 }
