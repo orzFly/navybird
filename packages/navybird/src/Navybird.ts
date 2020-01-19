@@ -18,6 +18,7 @@ import { ConcurrencyOption, map } from './functions/map';
 import { mapSeries } from './functions/mapSeries';
 import { nodeify, SpreadOption } from './functions/nodeify';
 import { MultiArgsNoErrorPromisifyOptions, MultiArgsPromisifyOptions, NoErrorPromisifyOptions, promisify, PromisifyOptions } from './functions/promisify';
+import { props, ResolvableProps } from './functions/props';
 import { reduce } from './functions/reduce';
 import { tapCatch } from './functions/tapCatch';
 import { timeout } from './functions/timeout';
@@ -120,6 +121,12 @@ export class Navybird<T> extends Promise<T> {
       return that.resolve().then(() => fn.apply(this, arguments))
     }
   }
+
+  /**
+   * @$TypeExpand typeof props
+   * @$$Eval (str) => str.replace(/GenericPromise/g, "Navybird").replace(/this: PromiseConstructorLikeThis, /g, "")
+   */
+  static props: { <K, V>(promise: Resolvable<Map<K, Resolvable<V>>>): Navybird<Map<K, V>>; <T>(promise: Resolvable<ResolvableProps<T>>): Navybird<T>; } = props as any
 
   // #region Instance Methods
 
@@ -349,6 +356,20 @@ export class Navybird<T> extends Promise<T> {
         return obj[key];
       }
     })
+  }
+
+  /**
+   * Same as calling `Promise.props(thisPromise)`.
+   */
+  props<K, V>(promise: Resolvable<Map<K, Resolvable<V>>>): Navybird<Map<K, V>>;
+  props<T>(promise: Resolvable<ResolvableProps<T>>): Navybird<T>;
+
+  props(): Navybird<any> {
+    const args = arguments
+    const promiseConstructor = this.constructor as typeof Navybird;
+    return this.then(function propsOnFulfilled(val: any) {
+      return promiseConstructor.props.call(promiseConstructor, val, ...args);
+    });
   }
 
   // #endregion
