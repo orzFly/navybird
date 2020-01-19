@@ -12,10 +12,19 @@ jobs:
     name: 'Validating Sequelize'
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        sequelize-branch: [v5, v4]
+
     steps:
     - uses: actions/checkout@master
 
-    - name: 'Use Node.js 12.x'
+    - name: 'Install native dependencies'
+      if: matrix.sequelize-branch == 'v4'
+      run: |
+        sudo apt-get install -y libpq-dev
+
+    - name: 'Install Node.js 12.x'
       uses: actions/setup-node@master
       with:
         version: 12.x
@@ -24,13 +33,19 @@ jobs:
       run: |
         yarn install --frozen-lockfile && yarn build
 
-    - name: 'Running the integration test'
+    - name: 'Install Node.js 8.x'
+      if: matrix.sequelize-branch == 'v4'
+      uses: actions/setup-node@master
+      with:
+        version: 8.x
+
+    - name: 'Downloading Sequelize ${{ matrix.sequelize-branch }}'
       run: |
         set -ex
         rm -Rf node_modules
         git clone https://github.com/sequelize/sequelize.git sequelize
         cd sequelize
-        git checkout v5.21.3
+        git checkout ${{ matrix.sequelize-branch }}
         npm install
 
         rm -Rf node_modules/bluebird node_modules/@types/bluebird
@@ -44,4 +59,19 @@ jobs:
         rm test/integration/cls.test.js                       # https://github.com/sequelize/sequelize/blob/v5.21.3/test/integration/cls.test.js
         rm test/unit/model/find-or-create.test.js             # https://github.com/sequelize/sequelize/blob/v5.21.3/test/unit/model/find-or-create.test.js
 
+    - name: 'Run test with SQLite dialect'
+      run: |
+        cd sequelize
         DIALECT=sqlite npm test
+
+    - name: 'Run test with MySQL dialect'
+      run: |
+        cd sequelize
+        mysql -uroot -proot -e "CREATE DATABASE sequelize_test;"
+        DIALECT=mysql \
+        SEQ_DB=sequelize_test SEQ_MYSQL_DB=sequelize_test \
+        SEQ_USER=root SEQ_MYSQL_USER=root \
+        SEQ_PW=root SEQ_MYSQL_PW=root \
+        SEQ_HOST=127.0.0.1 SEQ_MYSQL_HOST=127.0.0.1 \
+        SEQ_MYSQL_PORT=3306 \
+        npm test
