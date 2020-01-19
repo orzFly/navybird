@@ -25,12 +25,12 @@ export function fromCallback(
     const nodeback =
       options != null && Object(options).multiArgs
         ? function fromCallbackPromiseMultipleArgsNodeback(err: any, ...args: any[]) {
-          if (err) return reject(wrapAsOperationalError(err));
-          return resolve(args);
+          if (err) schedule(() => reject(wrapAsOperationalError(err)));
+          else schedule(() => resolve(args));
         }
         : function fromCallbackPromiseSingleArgNodeback(err: any, arg: any[]) {
-          if (err) return reject(wrapAsOperationalError(err));
-          return resolve(arg);
+          if (err) schedule(() => reject(wrapAsOperationalError(err)));
+          else schedule(() => resolve(arg));
         };
 
     try {
@@ -43,3 +43,5 @@ export function fromCallback(
 
 export type FromNodeOptions = FromCallbackOptions
 export const fromNode = fromCallback
+
+const schedule = setImmediate;
