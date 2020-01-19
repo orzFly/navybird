@@ -24,6 +24,7 @@ import { timeout } from './functions/timeout';
 import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
 
+const promiseResolve = Promise.resolve
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
@@ -386,7 +387,7 @@ export class Navybird<T> extends Promise<T> {
      * @returns A resolved promise.
      */
     (): Navybird<void>
-  }
+  } = promiseResolve as any
 
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -488,7 +489,6 @@ Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, stri
   notEnumerableProp(Navybird, key, Navybird[key]);
 });
 
-const promiseResolve = Promise.resolve
 export function getNewLibraryCopy(): typeof Navybird {
   const Newbird: typeof Navybird = class Navybird<T> extends Promise<T> { } as any
 

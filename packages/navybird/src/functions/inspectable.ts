@@ -1,6 +1,7 @@
 import { TypeError } from '../errors/TypeError';
 import { GenericPromise } from '../helpers/getPromiseConstructor';
 import { PromiseLikeValueType } from '../helpers/types';
+import { notEnumerableProp } from '../helpers/notEnumerableProp';
 
 export class Inspection<P extends PromiseLike<any>> {
   private _isPending: boolean
@@ -51,6 +52,10 @@ export class Inspection<P extends PromiseLike<any>> {
     return this._isPending;
   }
 
+  isResolved() {
+    return this.isRejected || this._isFulfilled;
+  }
+
   value() {
     if (this.isFulfilled()) return this._value;
 
@@ -61,6 +66,10 @@ export class Inspection<P extends PromiseLike<any>> {
     if (this.isRejected()) return this._reason;
 
     throw new TypeError("cannot get rejection reason of a non-rejected promise\n\n    See http://goo.gl/MqrFmX\n");
+  }
+
+  error() {
+    return this.reason()
   }
 }
 
@@ -77,9 +86,8 @@ export function reflect<P extends PromiseLike<any>>(
 export const NavybirdInspection = Symbol.for("NavybirdInspection");
 
 export interface Inspectable<P extends PromiseLike<any>>
-  extends Pick<
-    Inspection<PromiseLikeValueType<P>>,
-    'isFulfilled' | 'isPending' | 'isRejected' | 'value' | 'reason'
+  extends Pick<Inspection<PromiseLikeValueType<P>>,
+    'isFulfilled' | 'isPending' | 'isRejected' | 'isResolved' | 'value' | 'reason'
   > {
 }
 
@@ -92,12 +100,11 @@ export function inspectable<P extends PromiseLike<any>>(
   const result = inspection.target();
   Object.assign(result, {
     [NavybirdInspection]: inspection,
-    isFulfilled: inspection.isFulfilled.bind(inspection),
-    isPending: inspection.isPending.bind(inspection),
-    isRejected: inspection.isRejected.bind(inspection),
-    value: inspection.value.bind(inspection),
-    reason: inspection.reason.bind(inspection),
   })
+
+  for (const key of ["isFulfilled", "isPending", "isRejected", "isResolved", "value", "reason"] as const) {
+    notEnumerableProp(result, key, Inspection.prototype[key].bind(inspection));
+  }
 
   return result as any;
 };
