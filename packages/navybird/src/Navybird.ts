@@ -386,7 +386,7 @@ export class Navybird<T> extends Promise<T> {
      * @returns A resolved promise.
      */
     (): Navybird<void>
-  };
+  }
 
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -488,6 +488,7 @@ Object.keys(Navybird).forEach(function (key: Extract<keyof typeof Navybird, stri
   notEnumerableProp(Navybird, key, Navybird[key]);
 });
 
+const promiseResolve = Promise.resolve
 export function getNewLibraryCopy(): typeof Navybird {
   const Newbird: typeof Navybird = class Navybird<T> extends Promise<T> { } as any
 
@@ -503,6 +504,16 @@ export function getNewLibraryCopy(): typeof Navybird {
   Newbird.Navybird = Newbird
   Newbird.Bluebird = Newbird
   Newbird.Promise = Newbird
+
+  Newbird.resolve = function resolve(this: any, ...args: any[]) {
+    let promiseConstructor = Newbird;
+    if (this && typeof this === 'function' && this.resolve && this.prototype && this.prototype.then) {
+      promiseConstructor = this;
+    }
+
+    return promiseResolve.apply(promiseConstructor, args);
+  }
+  Newbird.resolve.prototype = Newbird;
 
   Newbird.cast = Newbird.resolve.bind(Newbird)
   Newbird.fulfilled = Newbird.resolve.bind(Newbird)
