@@ -326,6 +326,18 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
+  get<U extends keyof T>(key: U): Navybird<T[U]> {
+    return this.then(function getPropertyHandler(obj: any) {
+      if (typeof key === 'number') {
+        let index = +key;
+        if (index < 0) index = Math.max(0, index + obj.length);
+        return obj[index];
+      } else {
+        return obj[key];
+      }
+    })
+  }
+
   // #endregion
 
   // #region Original Methods
