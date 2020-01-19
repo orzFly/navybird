@@ -28,6 +28,7 @@ const promiseResolve = Promise.resolve
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
+  static bind: never = null as never
 
   /**
    * @$TypeExpand typeof defer
@@ -107,6 +108,17 @@ export class Navybird<T> extends Promise<T> {
 
   static attempt<T>(fn: () => T | PromiseLike<T>): Navybird<T> {
     return this.resolve().then(() => fn())
+  }
+
+  static method<T, Args extends any[]>(fn: (...args: Args) => T | PromiseLike<T>): (...args: Args) => Navybird<T> {
+    if (typeof fn !== "function") {
+      throw new errors.TypeError(`fn is not function`);
+      // TODO: return errors.TypeError(constants.FUNCTION_ERROR + utils.classString(fn));
+    }
+    const that = this;
+    return function () {
+      return that.resolve().then(() => fn.apply(this, arguments))
+    }
   }
 
   // #region Instance Methods
