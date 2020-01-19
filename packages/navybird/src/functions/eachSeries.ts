@@ -1,6 +1,7 @@
-import { Resolvable } from '../helpers/types';
 import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { Resolvable } from '../helpers/types';
 import { reduce } from './reduce';
+import { tapSchedule } from './schedule';
 
 /**
  * Iterate over an array, or a promise of an array, which contains promises (or a mix of promises and values) with the given iterator function with the signature (item, index, value) where item is the resolved value of a respective promise in the input array.
@@ -20,14 +21,14 @@ export function eachSeries<R, U>(
     reduce(
       iterable,
       function eachSeriesReducer(a, b, i, length) {
-        return Promise.resolve(iterator(b, i, length)).then(
+        return Promise.resolve(iterator(b, i, length)).then(tapSchedule).then(
           function eachSeriesMapperCallback(val) {
             ret.push(b);
           }
         );
       },
       {}
-    ).then(function eachSeriesResult() {
+    ).then(tapSchedule).then(function eachSeriesResult() {
       return ret
     })
   );

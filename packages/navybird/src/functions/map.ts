@@ -1,7 +1,8 @@
-import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
-import { isPromiseLike } from './isPromiseLike';
-import { Resolvable } from '../helpers/types';
 import { TypeError } from '../errors';
+import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { Resolvable } from '../helpers/types';
+import { isPromiseLike } from './isPromiseLike';
+import { schedule, tapSchedule } from './schedule';
 
 export interface ConcurrencyOption {
   concurrency: number;
@@ -65,7 +66,7 @@ export function map<R, U>(
 
       if (nextItem.done) {
         iterableDone = true;
-        if (resolvingCount === 0) resolve(ret);
+        if (resolvingCount === 0) schedule(() => resolve(ret));
         return;
       }
 
@@ -75,6 +76,7 @@ export function map<R, U>(
         .then(function mapMapperWrapper(el) {
           return mapper(el, i, length);
         })
+        .then(tapSchedule)
         .then(
           function mapResolvedCallback(val) {
             ret[i] = val;

@@ -10,8 +10,12 @@ export function immediate(
   const Promise = getPromiseConstructor(this);
 
   return new Promise(function immediatePromiseExecutor(resolve) {
-    setImmediate(function immediateTimeoutCallback() {
+    globalSetImmediate(function immediateTimeoutCallback() {
       resolve(value);
     });
   });
 };
+
+const globalSetImmediate = setImmediate;
+
+export function tapImmediate<T>(r: T) { return immediate(r) }
