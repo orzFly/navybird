@@ -431,6 +431,7 @@ export class Navybird<T> extends Promise<T> {
   static TypeError = errors.TypeError
   static OperationalError = errors.OperationalError
   static TimeoutError = errors.TimeoutError
+  static AggregateError = errors.AggregateError
 }
 
 export interface NavybirdDefer<T> extends Defer<T> {

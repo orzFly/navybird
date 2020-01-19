@@ -1,25 +1,37 @@
 import { notEnumerableProp } from '../helpers/notEnumerableProp';
 import { BLUEBIRD_ERRORS, OPERATIONAL_ERROR_KEY } from './bluebird';
 
-export class OperationalError extends Error {
-  readonly cause: any
-  readonly [OPERATIONAL_ERROR_KEY] = true
+export namespace Capsule {
+  export class OperationalError extends Error {
+    readonly cause: any
+    readonly [OPERATIONAL_ERROR_KEY] = true
 
-  constructor(message: any) {
-    super(message);
+    constructor(message: any) {
+      super(message);
 
-    notEnumerableProp(this, "name", "OperationalError");
-    notEnumerableProp(this, "message", message);
-    this.cause = message;
+      notEnumerableProp(this, "name", "OperationalError");
+      notEnumerableProp(this, "message", message);
+      this.cause = message;
 
-    if (message instanceof Error) {
-      notEnumerableProp(this, "message", message.message);
-      notEnumerableProp(this, "stack", message.stack);
-    } else if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
+      if (message instanceof Error) {
+        notEnumerableProp(this, "message", message.message);
+        notEnumerableProp(this, "stack", message.stack);
+      } else if (Error.captureStackTrace) {
+        Error.captureStackTrace(this, this.constructor);
+      }
     }
   }
 }
+
+export const OperationalError = (<T>(constructor: T): T & (T extends (new (...args: infer A) => infer R) ? (...args: A) => R : never) => {
+  const newTarget = function OperationalError(...args: any[]) {
+    return new (constructor as any)(...args)
+  }
+  newTarget.prototype = (constructor as any).prototype
+  newTarget.prototype.constructor = newTarget
+  return newTarget as any
+})(Capsule.OperationalError)
+export type OperationalError = Capsule.OperationalError
 
 const regexErrorKey = /^(?:name|message|stack|cause)$/;
 
