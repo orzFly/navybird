@@ -104,12 +104,14 @@ export class Navybird<T> extends Promise<T> {
   static promisify: { <T extends any[]>(func: (callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): () => Navybird<T>; <T extends any[], A1>(func: (arg1: A1, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1) => Navybird<T>; <T extends any[], A1, A2>(func: (arg1: A1, arg2: A2, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T extends any[], A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T extends any[], A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T extends any[], A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (...result: T) => void) => void, options: MultiArgsNoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T>(func: (callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): () => Navybird<T>; <T, A1>(func: (arg1: A1, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1) => Navybird<T>; <T, A1, A2>(func: (arg1: A1, arg2: A2, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T, A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T, A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T, A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (result?: T) => void) => void, options: NoErrorPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T extends any[]>(func: (callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): () => Navybird<T>; <T extends any[], A1>(func: (arg1: A1, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1) => Navybird<T>; <T extends any[], A1, A2>(func: (arg1: A1, arg2: A2, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T extends any[], A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T extends any[], A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T extends any[], A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (err: any, ...result: T) => void) => void, options: MultiArgsPromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; <T>(func: (callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): () => Navybird<T>; <T, A1>(func: (arg1: A1, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1) => Navybird<T>; <T, A1, A2>(func: (arg1: A1, arg2: A2, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2) => Navybird<T>; <T, A1, A2, A3>(func: (arg1: A1, arg2: A2, arg3: A3, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3) => Navybird<T>; <T, A1, A2, A3, A4>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4) => Navybird<T>; <T, A1, A2, A3, A4, A5>(func: (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, callback: (err: any, result?: T) => void) => void, options?: PromisifyOptions): (arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => Navybird<T>; } = promisify as any
 
   static try<T>(fn: () => T | PromiseLike<T>): Navybird<T> { 
-    return this.resolve().then(() => fn())
+    try {
+      return this.resolve(fn());
+    } catch (e) {
+      return this.reject(e);
+    }
   }
 
-  static attempt<T>(fn: () => T | PromiseLike<T>): Navybird<T> {
-    return this.resolve().then(() => fn())
-  }
+  static attempt = Navybird.try;
 
   static method<T, Args extends any[]>(fn: (...args: Args) => T | PromiseLike<T>): (...args: Args) => Navybird<T> {
     if (typeof fn !== "function") {
@@ -118,7 +120,11 @@ export class Navybird<T> extends Promise<T> {
     }
     const that = this;
     return function () {
-      return that.resolve().then(() => fn.apply(this, arguments))
+      try {
+        return that.resolve(fn.apply(this, arguments));
+      } catch (e) {
+        return that.reject(e);
+      }
     }
   }
 
