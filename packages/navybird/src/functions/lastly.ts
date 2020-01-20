@@ -6,14 +6,14 @@ export function lastly<P extends PromiseLike<any>>(promise: P, handler: () => Re
   return promise.then<PromiseLikeValueType<P>, never>(
     function finallyResolvedHandle(val) {
       return Promise
-        .resolve(handler())
+        .resolve(handler.call(this))
         .then(function finallyResolvedValue() {
           return val;
         });
     },
     function finallyRejectedHandle(err) {
       return Promise
-        .resolve(handler())
+        .resolve(handler.call(this))
         .then(function finallyRejectedValue() {
           throw err;
         });

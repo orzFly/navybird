@@ -1,5 +1,5 @@
 import { TimeoutError, TypeError } from '../errors';
-import { GenericPromise, getPromiseConstructor } from '../helpers/getPromiseConstructor';
+import { GenericPromise } from '../helpers/getPromiseConstructor';
 import { Resolvable } from '../helpers/types';
 import { lastly } from './lastly';
 
@@ -20,9 +20,9 @@ export function timeout<T>(
   ms: number,
   fallback?: string | Error | Function
 ): GenericPromise<T> {
-  const Promise = getPromiseConstructor(this);
+  const promiseConstructor = promise.constructor as PromiseConstructor
 
-  return new Promise(function timeoutPromiseExecutor(resolve, reject) {
+  return new promiseConstructor(function timeoutPromiseExecutor(resolve, reject) {
     if (typeof ms !== "number" || ms < 0) {
       throw new TypeError("Expected `ms` to be a positive number");
     }
