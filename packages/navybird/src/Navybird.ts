@@ -40,10 +40,54 @@ const nativePromiseMethods = (
     "all", "race",
   );
 
+const ThisBoundedSymbol = Symbol.for('Navybird.ThisBounded')
+
+function createBoundInstance(thisArg?: any) {
+  console.warn('A Navybird bound instance was created. Navybird.bind is provided for compatibility only thus the implemation has very bad performance. Do not use this in production!')
+  const Boundbird = getNewLibraryCopy()
+  const then = Boundbird.prototype.then
+  const ref = { thisArg };
+  (Boundbird.prototype as any)[ThisBoundedSymbol] = ref;
+  Boundbird.prototype.then = function boundThen(onfulfilled?, onrejected?) {
+    return then.call(this,
+      onfulfilled && function boundOnFulfilled() {
+        return onfulfilled.apply(ref.thisArg, arguments)
+      },
+      onrejected && function boundOnRejected() {
+        return onrejected.apply(ref.thisArg, arguments)
+      }
+    )
+  }
+  return { Boundbird, ref };
+}
+
 export class Navybird<T> extends Promise<T> {
   static isPromise: typeof isPromise = isPromise
   static isPromiseLike: typeof isPromiseLike = isPromiseLike
-  static bind: never = null as never
+
+  /** @deprecated */
+  static bind(thisArg: any, resolvedValue?: any) {
+    const { Boundbird, ref } = createBoundInstance()
+    return Boundbird.resolve(thisArg).tap((r) => ref.thisArg = r).return(resolvedValue)
+  }
+
+  /** @deprecated */
+  bind(thisArg: any): Navybird<T> {
+    const { Boundbird, ref } = createBoundInstance()
+    let throwed = false, error: any = undefined;
+    const valuePromise = Boundbird.resolve(thisArg)
+      .tap((r) => ref.thisArg = r)
+      .tapCatch((err) => { throwed = true; error = err; })
+
+    return Boundbird.resolve(this.then((v) => {
+      return valuePromise.return(v)
+    }, (e) => {
+      return valuePromise.then(
+        () => { throw e; },
+        throwed ? () => { throw error; } : () => { throw e; }
+      )
+    }));
+  }
 
   /**
    * @$TypeExpand typeof defer
@@ -163,8 +207,10 @@ export class Navybird<T> extends Promise<T> {
   lastly!: <P extends PromiseLike<any>>(this: P, handler: () => any) => P
 
   tap<U>(onFulFill: (value: T) => Resolvable<U>) {
+    const promiseConstructor = this.constructor as PromiseConstructor
+
     return this.then(function tapHandle(val) {
-      return Promise
+      return promiseConstructor
         .resolve(val)
         .then(onFulFill)
         .then(function tapReturnValue() {
@@ -268,7 +314,7 @@ export class Navybird<T> extends Promise<T> {
         throw new errors.TypeError(`fulfilledHandler is not function`);
         // TODO: return utils.apiRejection(constants.FUNCTION_ERROR + utils.classString(fn));
       }
-      return fulfilledHandler(...val);
+      return fulfilledHandler.apply(this, val);
     });
   }
 
@@ -290,6 +336,29 @@ export class Navybird<T> extends Promise<T> {
     });
   }
 
+  // /**
+  //  * Same as calling `Promise.race(thisPromise)`.
+  //  */
+  // race<T>(this: Navybird<Iterable<T | PromiseLike<T>>>): Navybird<T>;
+  // race<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>, T10 | PromiseLike<T10>]>): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10>;
+  // race<T1, T2, T3, T4, T5, T6, T7, T8, T9>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>, T9 | PromiseLike<T9>]>): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9>;
+  // race<T1, T2, T3, T4, T5, T6, T7, T8>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>, T8 | PromiseLike<T8>]>): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8>;
+  // race<T1, T2, T3, T4, T5, T6, T7>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>, T7 | PromiseLike<T7>]>): Navybird<T1 | T2 | T3 | T4 | T5 | T6 | T7>;
+  // race<T1, T2, T3, T4, T5, T6>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>, T6 | PromiseLike<T6>]>): Navybird<T1 | T2 | T3 | T4 | T5 | T6>;
+  // race<T1, T2, T3, T4, T5>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>, T5 | PromiseLike<T5>]>): Navybird<T1 | T2 | T3 | T4 | T5>;
+  // race<T1, T2, T3, T4>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>, T4 | PromiseLike<T4>]>): Navybird<T1 | T2 | T3 | T4>;
+  // race<T1, T2, T3>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>, T3 | PromiseLike<T3>]>): Navybird<T1 | T2 | T3>;
+  // race<T1, T2>(this: Navybird<[T1 | PromiseLike<T1>, T2 | PromiseLike<T2>]>): Navybird<T1 | T2>;
+  // race<T>(this: Navybird<(T | PromiseLike<T>)[]>): Navybird<T>;
+
+  // race(): Navybird<any> {
+  //   const args = arguments
+  //   const promiseConstructor = this.constructor as typeof Navybird;
+  //   return this.then(function raceOnFulfilled(val: any) {
+  //     return promiseConstructor.race.call(promiseConstructor, val, ...args);
+  //   });
+  // }
+
   /**
    * Same as calling `Promise.map(thisPromise, mapper)`.
    */
@@ -298,7 +367,9 @@ export class Navybird<T> extends Promise<T> {
   map(): Navybird<any> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function mapOnFulfilled(val: any) {
+    const promise = this as this & { [ThisBoundedSymbol]?: any };
+    return promise.then(function mapOnFulfilled(val: any) {
+      if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
       return promiseConstructor.map.call(promiseConstructor, val, ...args);
     });
   }
@@ -311,7 +382,9 @@ export class Navybird<T> extends Promise<T> {
   mapSeries(): Navybird<any> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function mapSeriesOnFulfilled(val: any) {
+    const promise = this as this & { [ThisBoundedSymbol]?: any };
+    return promise.then(function mapSeriesOnFulfilled(val: any) {
+      if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
       return promiseConstructor.mapSeries.call(promiseConstructor, val, ...args);
     });
   }
@@ -324,7 +397,9 @@ export class Navybird<T> extends Promise<T> {
   reduce(): Navybird<any> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function reduceOnFulfilled(val: any) {
+    const promise = this as this & { [ThisBoundedSymbol]?: any };
+    return promise.then(function reduceOnFulfilled(val: any) {
+      if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
       return promiseConstructor.reduce.call(promiseConstructor, val, ...args);
     });
   }
@@ -337,7 +412,9 @@ export class Navybird<T> extends Promise<T> {
   each(): Navybird<any> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function eachOnFulfilled(val: any) {
+    const promise = this as this & { [ThisBoundedSymbol]?: any };
+    return promise.then(function eachOnFulfilled(val: any) {
+      if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
       return promiseConstructor.each.call(promiseConstructor, val, ...args);
     });
   }
@@ -350,7 +427,9 @@ export class Navybird<T> extends Promise<T> {
   eachSeries(): Navybird<any> {
     const args = arguments
     const promiseConstructor = this.constructor as typeof Navybird;
-    return this.then(function eachSeriesOnFulfilled(val: any) {
+    const promise = this as this & { [ThisBoundedSymbol]?: any };
+    return promise.then(function eachSeriesOnFulfilled(val: any) {
+      if (promise[ThisBoundedSymbol] && typeof args[0] === 'function') args[0] = args[0].bind(this);
       return promiseConstructor.eachSeries.call(promiseConstructor, val, ...args);
     });
   }
@@ -488,6 +567,7 @@ export interface NavybirdDefer<T> extends Defer<T> {
 
 let instance = 0;
 export function getNewLibraryCopy(): typeof Navybird {
+  const instanceNumber = instance++
   const Newbird: typeof Navybird = class Navybird<T> extends Promise<T> { } as any
 
   const rootProperties = Object.getOwnPropertyDescriptors(Navybird)
@@ -502,7 +582,6 @@ export function getNewLibraryCopy(): typeof Navybird {
   Object.defineProperties(Newbird, rootProperties);
 
   if (functionProperties.name) {
-    const instanceNumber = instance++
     if (instanceNumber > 0) {
       functionProperties.name.value = `Navybird${instanceNumber}`;
     }

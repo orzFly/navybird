@@ -52,26 +52,27 @@ function isErrorConstructor(constructor: unknown): constructor is ErrorConstruct
 export function catchIf<T>(predicate: CatchIfPredicate, catchHandler: (error: Error) => T | PromiseLike<T>): (
   error: Error
 ) => T | PromiseLike<T> {
-  return function catchIfHandler (error) {
+  return function catchIfHandler(error) {
+    const THIS = this;
     if (typeof catchHandler !== 'function') {
       throw new TypeError('Expected a catch handler');
     }
 
     if (predicate === true) {
-      return catchHandler(error);
+      return catchHandler.call(THIS, error);
     }
 
     if (Array.isArray(predicate) || isErrorConstructor(predicate)) {
       if (([] as ErrorConstructor[])
         .concat(predicate)
         .some((errorConstructor) => error instanceof errorConstructor)) {
-        return catchHandler(error);
+        return catchHandler.call(THIS, error);
       }
     } else if (typeof predicate === 'function') {
       return (async function catchIfPredicateEvaluator() {
         const value = await (predicate as any)(error);
         if (value === true) {
-          return catchHandler(error);
+          return catchHandler.call(THIS, error);
         }
 
         throw error;
