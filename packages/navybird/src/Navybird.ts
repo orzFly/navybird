@@ -26,6 +26,7 @@ import { tapCatch } from './functions/tapCatch';
 import { timeout } from './functions/timeout';
 import { notEnumerableProp } from './helpers/notEnumerableProp';
 import { PromiseLikeValueType, Resolvable } from './helpers/types';
+import { warning } from './helpers/warning';
 
 const nativePromiseMethods = (
   <K extends Array<keyof PromiseConstructor>>(...keys: K):
@@ -43,7 +44,7 @@ const nativePromiseMethods = (
 const ThisBoundedSymbol = Symbol.for('Navybird.ThisBounded')
 
 function createBoundInstance(thisArg?: any) {
-  console.warn('A Navybird bound instance was created. Navybird.bind is provided for compatibility only thus the implemation has very bad performance. Do not use this in production!')
+  warning('A Navybird bound instance was created. Navybird.bind is provided for compatibility only thus the implemation has very bad performance. Do not use this in production!')
   const Boundbird = getNewLibraryCopy()
   const then = Boundbird.prototype.then
   const ref = { thisArg };
@@ -195,7 +196,7 @@ export class Navybird<T> extends Promise<T> {
    * Like `.catch` but instead of catching all types of exceptions, it only catches those that don't originate from thrown errors but rather from explicit rejections.
    */
   error<U>(onReject: (reason: any) => U | PromiseLike<U>) {
-    return this.then(null, catchIf(originatesFromRejection, onReject))
+    return this.then(null, catchIf([originatesFromRejection], onReject))
   }
 
   finally!: Navybird<T>['lastly']

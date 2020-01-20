@@ -4,7 +4,8 @@ import { caughtHandlerFactory } from './caughtHandlerFactory';
 
 export type CatchFilter<E> =
   | (new (...args: any[]) => E)
-  | ((error: E) => boolean)
+  | ((error: E) => boolean | PromiseLike<boolean>)
+  | RegExp
   | (object & E);
 
 /**
