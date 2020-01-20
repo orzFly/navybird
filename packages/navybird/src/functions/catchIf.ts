@@ -55,6 +55,8 @@ export function catchIf<T>(predicates: ReadonlyArray<CatchFilter<any>>, catchHan
         if (matched) {
           return catchHandler.call(THIS, error);
         }
+      } else {
+        warning('An invalid catch filter has been passed to Navybird.catch. This will be treated as catch-none.')
       }
     }
 
